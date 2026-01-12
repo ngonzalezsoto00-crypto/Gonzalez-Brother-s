@@ -1,0 +1,696 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Gestión de Producción para Sastrería González Brother's">
+    <meta name="theme-color" content="#C9A961">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>SastreControl - González Brother's v3.0 Moderna</title>
+    <link rel="stylesheet" href="styles.css?v=3.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SastreControl">
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="logo" style="margin-bottom: 30px;">
+                <img src="logo.png" alt="González Brother's Sastrería" style="max-width: 400px; width: 90%; height: auto; margin-bottom: 20px; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display: none; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #1a3a52, #2a5a7c); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 3px solid #C9A961;">
+                        <span style="font-size: 2.5em;">✂️</span>
+                    </div>
+                    <div style="text-align: left;">
+                        <h1 style="background: linear-gradient(135deg, #1a3a52, #C9A961); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 2em; margin: 0; line-height: 1.2; font-weight: 700; letter-spacing: -1px;">González Brother's</h1>
+                        <p style="color: #1a3a52; font-size: 0.75em; margin: 0; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;">Sastrería</p>
+                    </div>
+                </div>
+                <p class="subtitle" style="color: #1a3a52; font-weight: 600; font-size: 1em; margin-top: 10px;">SastreControl: Gestión de Producción</p>
+            </div>
+            
+            <div class="role-selection">
+                <h2 style="color: #1a3a52; font-size: 1.3em; margin-bottom: 20px; font-weight: 600;">Selecciona tu rol</h2>
+                <button onclick="selectRole('domiciliario')" class="role-btn domiciliario-btn" style="background: linear-gradient(135deg, #1a3a52, #2a5a7c); border: 2px solid #C9A961; color: white;">
+                    <span class="icon">🚗</span>
+                    <span>Domiciliario</span>
+                </button>
+                <button onclick="selectRole('senalador')" class="role-btn senalador-btn" style="background: linear-gradient(135deg, #1a3a52, #2a5a7c); border: 2px solid #C9A961; color: white;">
+                    <span class="icon">📏</span>
+                    <span>Señalador</span>
+                </button>
+                <button onclick="selectRole('sastre')" class="role-btn sastre-btn" style="background: linear-gradient(135deg, #C9A961, #d4b574); border: 2px solid #1a3a52; color: #1a3a52;">
+                    <span class="icon">👔</span>
+                    <span>Sastre</span>
+                </button>
+                <button onclick="selectRole('admin')" class="role-btn admin-btn" style="background: linear-gradient(135deg, #1a3a52, #C9A961); border: 2px solid #C9A961; color: white;">
+                    <span class="icon">⚙️</span>
+                    <span>Administrador</span>
+                </button>
+                <button onclick="selectRole('owner')" class="role-btn owner-btn" style="background: linear-gradient(135deg, #C9A961, #d4b574); border: 2px solid #1a3a52; color: #1a3a52; font-weight: 600;">
+                    <span class="icon">👑</span>
+                    <span>Dueño</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Autenticación -->
+    <div id="authScreen" class="screen">
+        <div class="auth-container">
+            <button onclick="backToLogin()" class="back-btn">← Volver</button>
+            <h2 id="authTitle" style="color: #1a3a52; font-size: 1.8em; margin-bottom: 25px; font-weight: 700;">Iniciar Sesión</h2>
+            
+            <div id="domiciliarioAuth" class="auth-form" style="display: none;">
+                <label>Nombre del Domiciliario:</label>
+                <input type="text" id="domiciliarioName" placeholder="Ej: Pedro Martínez">
+                <button onclick="loginDomiciliario()" class="submit-btn">Ingresar</button>
+            </div>
+
+            <div id="senaladorAuth" class="auth-form" style="display: none;">
+                <label>Nombre del Señalador:</label>
+                <input type="text" id="senaladorName" placeholder="Ej: Carlos López">
+                <button onclick="loginSenalador()" class="submit-btn">Ingresar</button>
+            </div>
+
+            <div id="sastreAuth" class="auth-form" style="display: none;">
+                <label>Seleccionar Sastre:</label>
+                <select id="sastreSelect">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+                <label>PIN del Sastre:</label>
+                <input type="password" id="sastrePin" placeholder="Ingrese su PIN">
+                <button onclick="loginSastre()" class="submit-btn">Ingresar</button>
+            </div>
+
+            <div id="adminAuth" class="auth-form" style="display: none;">
+                <label>PIN de Administrador:</label>
+                <input type="password" id="adminPin" placeholder="Ingrese PIN">
+                <button onclick="loginAdmin()" class="submit-btn">Ingresar</button>
+                <p class="hint">PIN predeterminado: 1234</p>
+            </div>
+
+            <div id="ownerAuth" class="auth-form" style="display: none;">
+                <label>PIN de Dueño:</label>
+                <input type="password" id="ownerPin" placeholder="Ingrese PIN">
+                <button onclick="loginOwner()" class="submit-btn">Ingresar</button>
+                <p class="hint">PIN predeterminado: 0000</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard del Domiciliario -->
+    <div id="domiciliarioScreen" class="screen">
+        <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520;">
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🚗 Panel del Domiciliario</h2>
+            <div class="user-info">
+                <span id="domiciliarioNameDisplay" style="color: white; font-weight: bold;"></span>
+                <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Salir</button>
+            </div>
+        </div>
+
+        <div class="info-panel" style="background: linear-gradient(135deg, #052A3D, #DAA520); color: white; padding: 20px; border-radius: 10px; margin: 20px; text-align: center; border: 3px solid #DAA520;">
+            <h3 style="margin: 0 0 10px 0; color: white;">📋 Crear Nueva Factura</h3>
+            <p style="margin: 0; opacity: 0.9;">Recepción de cliente y registro de trabajo</p>
+        </div>
+
+        <div class="recepcion-container" style="padding: 20px; max-width: 1000px; margin: 0 auto;">
+            <form onsubmit="registrarFacturaDomiciliario(event)" class="cliente-form" style="background: white; border: 3px solid #052A3D; border-radius: 10px; padding: 25px;">
+                <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin-bottom: 20px;">👤 Datos del Cliente</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cédula del Cliente: *</label>
+                        <input type="text" id="domClienteCedula" placeholder="Ej: 1234567890" required>
+                        <button type="button" onclick="buscarClientePorCedulaDom()" class="btn-buscar">🔍 Buscar</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre Completo: *</label>
+                        <input type="text" id="domClienteNombre" placeholder="Ej: Pedro Ramírez" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Celular: *</label>
+                        <input type="tel" id="domClienteCelular" placeholder="Ej: 3001234567" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Dirección: *</label>
+                    <input type="text" id="domClienteDireccion" placeholder="Ej: Calle 123 #45-67" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Señalador Asignado: *</label>
+                    <select id="domSenaladorAsignado" required>
+                        <option value="">-- Seleccionar --</option>
+                    </select>
+                </div>
+
+                <h4 style="color: #DAA520; border-bottom: 3px solid #DAA520; padding-bottom: 8px; margin: 25px 0 20px 0;">✂️ Detalles del Trabajo</h4>
+
+                <div class="form-group">
+                    <label>Descripción del Trabajo: *</label>
+                    <textarea id="domTrabajoDescripcion" placeholder="Ej: Ajustar pantalón, bajar ruedo..." rows="4" required style="border: 2px solid #052A3D;"></textarea>
+                </div>
+
+                <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin: 25px 0 20px 0;">💰 Información de Pago</h4>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio Total: *</label>
+                        <input type="number" id="domPrecioTotal" placeholder="Ej: 50000" step="1000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Abono: *</label>
+                        <input type="number" id="domAbono" placeholder="Ej: 20000" step="1000" value="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado de Pago:</label>
+                    <select id="domEstadoPago">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="abonado">Abonado</option>
+                        <option value="pagado">Pagado</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #052A3D, #DAA520); font-size: 1.2em; padding: 15px; border: 3px solid #DAA520;">✅ Crear Factura</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard del Señalador -->
+    <div id="senaladorScreen" class="screen">
+        <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520;">
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">📏 Panel del Señalador</h2>
+            <div class="user-info">
+                <span id="senaladorNameDisplay" style="color: white; font-weight: bold;"></span>
+                <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Salir</button>
+            </div>
+        </div>
+
+        <div class="info-panel" style="background: linear-gradient(135deg, #052A3D, #DAA520); color: white; padding: 20px; border-radius: 10px; margin: 20px; text-align: center; border: 3px solid #DAA520;">
+            <h3 style="margin: 0 0 10px 0;">📊 Tu Desempeño del Mes</h3>
+            <p style="margin: 0; opacity: 0.9;">Solo visualización de tus facturas asignadas</p>
+        </div>
+
+        <div class="stats-senalador" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px;">
+            <div class="stat-card-senalador" style="background: linear-gradient(135deg, #052A3D, #8AB4C7); border: 2px solid #052A3D;">
+                <h4 style="color: #052A3D;">📋 Número de Facturas</h4>
+                <p class="stat-number" id="totalFacturasSenalador" style="font-size: 3.5em; color: #052A3D; font-weight: bold;">0</p>
+                <p style="font-size: 0.9em; color: #666; margin: 5px 0 0 0;">Facturas asignadas</p>
+            </div>
+            <div class="stat-card-senalador" style="background: linear-gradient(135deg, #DAA520, #FFF9C4); border: 2px solid #DAA520;">
+                <h4 style="color: #F57C00;">💰 Total Acumulado</h4>
+                <p class="stat-number" style="font-size: 3.5em; color: #F57C00; font-weight: bold;">$ <span id="totalRecepcionadoSenalador">0</span></p>
+                <p style="font-size: 0.9em; color: #666; margin: 5px 0 0 0;">Suma de precios</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard del Sastre -->
+    <div id="sastreScreen" class="screen">
+
+        <div class="header">
+            <h2>Mi Producción Diaria</h2>
+            <div class="user-info">
+                <span id="sastreNameDisplay"></span>
+                <button onclick="logout()" class="logout-btn">Salir</button>
+            </div>
+        </div>
+
+        <div class="periodo-info">
+            <div class="periodo-badge" id="periodoActual">
+                <span class="periodo-color"></span>
+                <span class="periodo-text"></span>
+            </div>
+        </div>
+
+        <div class="registro-rapido">
+            <h3>Registro de Trabajo</h3>
+            <form onsubmit="registrarTrabajoSastre(event)" class="quick-form">
+                <div class="form-group">
+                    <label>Número de Factura:</label>
+                    <input type="text" id="facturaInput" placeholder="Ej: FAC-001" required>
+                    <button type="button" onclick="buscarFacturaInfo()" class="btn-buscar">🔍 Buscar</button>
+                </div>
+                <div id="infoFactura" class="info-factura" style="display: none;">
+                    <p><strong>Cliente:</strong> <span id="infoCliente"></span></p>
+                    <p><strong>Trabajo:</strong> <span id="infoTrabajo"></span></p>
+                    <p><strong>Precio:</strong> $ <span id="infoPrecio"></span></p>
+                </div>
+                <div class="form-group">
+                    <label>¿Es Garantía?</label>
+                    <select id="tipoTrabajo">
+                        <option value="normal">No - Trabajo Normal</option>
+                        <option value="garantia">Sí - Garantía</option>
+                    </select>
+                </div>
+                <div id="garantiaNote" class="form-group" style="display: none;">
+                    <label>Nota de Garantía (Obligatorio):</label>
+                    <textarea id="notaGarantia" placeholder="¿Qué falló?"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">✅ Registrar Trabajo Completado</button>
+            </form>
+        </div>
+
+        <div class="mi-produccion">
+            <h3>Mi Producción</h3>
+            <div class="stats-grid">
+                <div class="stat-card azul">
+                    <h4>Azul (1-10)</h4>
+                    <p class="stat-number" id="totalAzul">0</p>
+                    <p class="stat-label">$ <span id="montoAzul">0.00</span></p>
+                </div>
+                <div class="stat-card amarillo">
+                    <h4>Amarillo (11-20)</h4>
+                    <p class="stat-number" id="totalAmarillo">0</p>
+                    <p class="stat-label">$ <span id="montoAmarillo">0.00</span></p>
+                </div>
+                <div class="stat-card verde">
+                    <h4>Verde (21-30/31)</h4>
+                    <p class="stat-number" id="totalVerde">0</p>
+                    <p class="stat-label">$ <span id="montoVerde">0.00</span></p>
+                </div>
+                <div class="stat-card rojo">
+                    <h4>Rojo (Garantía)</h4>
+                    <p class="stat-number" id="totalRojo">0</p>
+                    <p class="stat-label">$ <span id="montoRojo">0.00</span></p>
+                </div>
+            </div>
+
+            <div class="total-produccion">
+                <h3>Total Mes Actual: $ <span id="totalMesActual">0</span> COP</h3>
+            </div>
+
+            <div class="listado-prendas">
+                <h4>Historial de Trabajos</h4>
+                <div id="listaPrendasSastre" class="tabla-excel"></div>
+            </div>
+        </div>
+
+        <div class="menu-bottom">
+            <button onclick="showHistorial()" class="menu-btn">📊 Historial Mensual</button>
+        </div>
+    </div>
+
+    <!-- Dashboard del Administrador -->
+    <div id="adminScreen" class="screen">
+        <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520;">
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">⚙️ Panel de Administración</h2>
+            <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Cerrar Sesión</button>
+        </div>
+
+        <div class="admin-tabs">
+            <button onclick="showAdminTab('crearFactura')" class="tab-btn active" id="tabCrearFactura" style="background: linear-gradient(135deg, #052A3D, #052A3D);">📋 Recepción</button>
+            <button onclick="showAdminTab('facturas')" class="tab-btn" id="tabFacturas">📄 Facturas</button>
+            <button onclick="showAdminTab('gestionSastres')" class="tab-btn" id="tabGestionSastres">👔 Gestionar Sastres</button>
+            <button onclick="showAdminTab('gestionEmpleados')" class="tab-btn" id="tabGestionEmpleados" style="background: linear-gradient(135deg, #DAA520, #FFC107);">👥 Registro de Trabajadores</button>
+            <button onclick="showAdminTab('sastres')" class="tab-btn" id="tabSastres">📊 Producción Sastres</button>
+            <button onclick="showAdminTab('senaladores')" class="tab-btn" id="tabSenaladores">📏 Señaladores</button>
+            <button onclick="showAdminTab('liquidacion')" class="tab-btn" id="tabLiquidacion">💰 Liquidación</button>
+            <button onclick="showAdminTab('periodos')" class="tab-btn" id="tabPeriodos">📅 Periodos</button>
+            <button onclick="showAdminTab('historial')" class="tab-btn" id="tabHistorial">📊 Historial</button>
+        </div>
+
+        <!-- Tab: Recepción -->
+        <div id="adminTabCrearFactura" class="admin-tab active">
+            <h3 style="color: #052A3D; font-size: 1.5em;">📋 Recepción de Cliente y Creación de Factura</h3>
+            <div class="recepcion-container">
+                <div style="background: linear-gradient(135deg, #052A3D, #DAA520); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; border: 3px solid #DAA520;">
+                    <h4 style="margin: 0; color: white; font-size: 1.2em;">📝 FORMULARIO DE RECEPCIÓN</h4>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9em; opacity: 0.9;">Complete todos los datos del cliente y del trabajo</p>
+                </div>
+                <form onsubmit="registrarFacturaAdmin(event)" class="cliente-form" style="background: linear-gradient(135deg, #E1F5FE, #FFF9C4); border: 3px solid #DAA520; border-radius: 10px; padding: 25px;">
+                    <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin-bottom: 20px;">👤 Datos del Cliente</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cédula del Cliente: *</label>
+                            <input type="text" id="adminClienteCedula" placeholder="Ej: 1234567890" required>
+                            <button type="button" onclick="buscarClientePorCedulaAdmin()" class="btn-buscar">🔍 Buscar</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre Completo: *</label>
+                            <input type="text" id="adminClienteNombre" placeholder="Ej: Pedro Ramírez" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Celular: *</label>
+                            <input type="tel" id="adminClienteCelular" placeholder="Ej: 3001234567" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Dirección: *</label>
+                        <input type="text" id="adminClienteDireccion" placeholder="Ej: Calle 123 #45-67" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Señalador Asignado: *</label>
+                        <select id="senaladorAsignado" required>
+                            <option value="">-- Seleccionar --</option>
+                        </select>
+                    </div>
+
+                    <h4 style="color: #DAA520; border-bottom: 3px solid #DAA520; padding-bottom: 8px; margin: 25px 0 20px 0;">✂️ Detalles del Trabajo</h4>
+
+                    <div class="form-group">
+                        <label>Descripción del Trabajo: *</label>
+                        <textarea id="adminTrabajoDescripcion" placeholder="Ej: Ajustar pantalón a la cintura, bajar ruedo 3cm..." rows="4" required style="border: 2px solid #052A3D;"></textarea>
+                    </div>
+
+                    <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin: 25px 0 20px 0;">💰 Información de Pago</h4>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Precio Total: *</label>
+                            <input type="number" id="adminPrecioTotal" placeholder="Ej: 50000" step="1000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Abono: *</label>
+                            <input type="number" id="adminAbono" placeholder="Ej: 20000" step="1000" value="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado de Pago:</label>
+                        <select id="adminEstadoPago">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="abonado">Abonado</option>
+                            <option value="pagado">Pagado</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #052A3D, #DAA520); font-size: 1.2em; padding: 15px; border: 3px solid #DAA520; box-shadow: 0 4px 8px rgba(79, 195, 247, 0.4);">✅ Registrar Recepción y Crear Factura</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab: Gestión de Sastres -->
+        <div id="adminTabGestionSastres" class="admin-tab">
+            <h3>👥 Gestión de Sastres</h3>
+            
+            <div class="agregar-sastre">
+                <h4>➕ Agregar Nuevo Sastre</h4>
+                <form onsubmit="agregarSastre(event)" class="sastre-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre del Sastre: *</label>
+                            <input type="text" id="nuevoSastreNombre" placeholder="Ej: Juan Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PIN de Acceso (4 dígitos): *</label>
+                            <input type="password" id="nuevoSastrePin" placeholder="Ej: 1234" maxlength="4" pattern="[0-9]{4}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">✅ Agregar Sastre</button>
+                </form>
+            </div>
+
+            <div class="lista-sastres">
+                <h4>📊 Sastres Registrados</h4>
+                <div id="tablaSastresRegistrados" class="tabla-excel"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Gestión de Empleados -->
+        <div id="adminTabGestionEmpleados" class="admin-tab">
+            <h3 style="color: #052A3D;">👥 Registro de Trabajadores</h3>
+            
+            <div class="form-container" style="background: linear-gradient(135deg, #E1F5FE, #FFF9C4); border: 3px solid #DAA520; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
+                <h4 style="color: #052A3D;">➕ Registrar Nuevo Trabajador</h4>
+                <form onsubmit="agregarEmpleado(event)">
+                    <div class="form-group">
+                        <label>Nombre Completo del Trabajador:</label>
+                        <input type="text" id="nuevoEmpleadoNombre" required placeholder="Nombre completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Rol del Trabajador:</label>
+                        <select id="nuevoEmpleadoRol" required style="border: 2px solid #052A3D;">
+                            <option value="">-- Seleccionar Rol --</option>
+                            <option value="domiciliario">🚗 Domiciliario</option>
+                            <option value="senalador">📏 Señalador</option>
+                            <option value="cortador">✂️ Cortador</option>
+                            <option value="planchador">👔 Planchador</option>
+                            <option value="auxiliar">🔧 Auxiliar</option>
+                            <option value="bodeguero">📦 Bodeguero</option>
+                            <option value="limpieza">🧹 Limpieza</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cédula:</label>
+                        <input type="text" id="nuevoEmpleadoCedula" required placeholder="Número de cédula">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input type="tel" id="nuevoEmpleadoTelefono" placeholder="Teléfono (opcional)">
+                    </div>
+                    <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #052A3D, #DAA520); font-size: 1.1em; padding: 12px;">✅ Registrar Trabajador</button>
+                </form>
+            </div>
+
+            <h4 style="color: #DAA520;">📋 Lista de Trabajadores Registrados</h4>
+            <div id="tablaEmpleadosRegistrados" class="tabla-excel"></div>
+        </div>
+
+        <!-- Tab: Facturas -->
+        <div id="adminTabFacturas" class="admin-tab">
+            <h3>Gestión de Facturas</h3>
+            <div class="search-box">
+                <input type="text" id="searchFacturasAdmin" placeholder="Buscar por nombre, cédula, celular o # de factura...">
+                <button onclick="buscarFacturasAdmin()" class="submit-btn">🔍 Buscar</button>
+            </div>
+            <div id="tablaFacturasAdmin" class="tabla-excel"></div>
+        </div>
+
+        <!-- Tab: Señaladores -->
+        <div id="adminTabSenaladores" class="admin-tab">
+            <h3>Producción de Señaladores</h3>
+            <div id="listaSenaladores" class="tabla-excel"></div>
+        </div>
+
+        <!-- Tab: Sastres -->
+        <div id="adminTabSastres" class="admin-tab">
+            <h3>Producción por Sastre</h3>
+            
+            <div class="periodo-tabs">
+                <button class="periodo-tab active" onclick="showPeriodoTab('azul')" id="tabPeriodoAzul">
+                    <span class="color-indicator" style="background: #2196F3;"></span>
+                    Azul (1-10)
+                </button>
+                <button class="periodo-tab" onclick="showPeriodoTab('amarillo')" id="tabPeriodoAmarillo">
+                    <span class="color-indicator" style="background: #FFC107;"></span>
+                    Amarillo (11-20)
+                </button>
+                <button class="periodo-tab" onclick="showPeriodoTab('verde')" id="tabPeriodoVerde">
+                    <span class="color-indicator" style="background: #4CAF50;"></span>
+                    Verde (21-30/31)
+                </button>
+                <button class="periodo-tab" onclick="showPeriodoTab('rojo')" id="tabPeriodoRojo">
+                    <span class="color-indicator" style="background: #F44336;"></span>
+                    Garantías
+                </button>
+                <button class="periodo-tab" onclick="showPeriodoTab('todos')" id="tabPeriodoTodos">
+                    📊 Todos
+                </button>
+            </div>
+
+            <div id="periodoAzul" class="periodo-content active">
+                <div class="tabla-excel" id="tablaAzul"></div>
+            </div>
+            <div id="periodoAmarillo" class="periodo-content">
+                <div class="tabla-excel" id="tablaAmarillo"></div>
+            </div>
+            <div id="periodoVerde" class="periodo-content">
+                <div class="tabla-excel" id="tablaVerde"></div>
+            </div>
+            <div id="periodoRojo" class="periodo-content">
+                <div class="tabla-excel" id="tablaRojo"></div>
+            </div>
+            <div id="periodoTodos" class="periodo-content">
+                <div class="tabla-excel" id="tablaTodos"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Liquidación -->
+        <div id="adminTabLiquidacion" class="admin-tab">
+            <h3>Liquidación y Deducciones</h3>
+            <div class="sastre-selector">
+                <label>Seleccionar Sastre:</label>
+                <select id="sastreSelectLiquidacion" onchange="calcularLiquidacion()">
+                    <option value="">-- Seleccionar --</option>
+                </select>
+            </div>
+
+            <div id="liquidacionPanel" style="display: none;">
+                <div class="liquidacion-card">
+                    <h4>Suma Bruta del Mes</h4>
+                    <p class="amount-display">$ <span id="sumaBruta">0</span> COP</p>
+                </div>
+
+                <div class="deducciones-panel">
+                    <h4>Deducciones</h4>
+                    <div class="form-group">
+                        <label>Salud (4%):</label>
+                        <input type="number" id="porcentajeSalud" value="4" step="0.01" oninput="calcularLiquidacion()">
+                        <p class="calculated">= $ <span id="montoSalud">0</span> COP</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Pensión (4%):</label>
+                        <input type="number" id="porcentajePension" value="4" step="0.01" oninput="calcularLiquidacion()">
+                        <p class="calculated">= $ <span id="montoPension">0</span> COP</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Préstamos ($ COP):</label>
+                        <input type="number" id="montoPrestamo" value="0" step="1000" oninput="calcularLiquidacion()">
+                    </div>
+                    <div class="form-group">
+                        <label>Otros Descuentos ($ COP):</label>
+                        <input type="number" id="otrosDescuentos" value="0" step="1000" oninput="calcularLiquidacion()">
+                        <input type="text" id="conceptoOtros" placeholder="Concepto">
+                    </div>
+                </div>
+
+                <div class="pago-neto-card">
+                    <h4>Pago Neto</h4>
+                    <p class="amount-display final">$ <span id="pagoNeto">0</span> COP</p>
+                </div>
+
+                <button onclick="generarVolante()" class="submit-btn">Generar Volante de Pago (PDF)</button>
+            </div>
+        </div>
+
+        <!-- Tab: Periodos -->
+        <div id="adminTabPeriodos" class="admin-tab">
+            <h3>Gestión de Periodos</h3>
+            <div class="periodo-actual-info">
+                <h4>Periodo Actual</h4>
+                <div id="periodoActualAdmin"></div>
+            </div>
+
+            <div class="periodos-cerrados">
+                <h4>Periodos Cerrados</h4>
+                <div id="periodosCerradosList"></div>
+            </div>
+
+            <button onclick="cerrarPeriodoActual()" class="submit-btn danger">Cerrar Periodo Actual</button>
+        </div>
+
+        <!-- Tab: Historial -->
+        <div id="adminTabHistorial" class="admin-tab">
+            <h3>Historial Mensual</h3>
+            <div id="historialAdminPanel"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard del Dueño -->
+    <div id="ownerScreen" class="screen">
+        <div class="header" style="background: linear-gradient(135deg, #DAA520, #FFA000); border-bottom: 3px solid #052A3D;">
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">👑 Panel del Dueño</h2>
+            <button onclick="logout()" class="logout-btn" style="background: white; color: #DAA520; border: 2px solid #052A3D;">Cerrar Sesión</button>
+        </div>
+
+        <div class="stats-overview">
+            <h3>Estadísticas Generales</h3>
+            <div class="stats-grid-owner">
+                <div class="stat-card-owner">
+                    <h4>Producción Total Mes</h4>
+                    <p class="stat-number-owner">$ <span id="produccionTotalMes">0</span></p>
+                </div>
+                <div class="stat-card-owner">
+                    <h4>Total Sastres Activos</h4>
+                    <p class="stat-number-owner"><span id="sastresActivos">0</span></p>
+                </div>
+                <div class="stat-card-owner">
+                    <h4>Garantías del Mes</h4>
+                    <p class="stat-number-owner"><span id="garantiasMes">0</span></p>
+                </div>
+                <div class="stat-card-owner">
+                    <h4>Prendas Procesadas</h4>
+                    <p class="stat-number-owner"><span id="prendasMes">0</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="owner-sections">
+            <button onclick="showOwnerSection('reportes')" class="owner-tab-btn">📈 Reportes</button>
+            <button onclick="showOwnerSection('configuracion')" class="owner-tab-btn">⚙️ Configuración</button>
+            <button onclick="showOwnerSection('historial')" class="owner-tab-btn">📊 Historial</button>
+        </div>
+
+        <div id="ownerReportes" class="owner-section active">
+            <h3>Reportes Detallados</h3>
+            <div id="reportesSastres"></div>
+        </div>
+
+        <div id="ownerConfiguracion" class="owner-section">
+            <h3>Configuración del Sistema</h3>
+            <div class="config-panel">
+                <div class="form-group">
+                    <label>PIN Administrador:</label>
+                    <input type="password" id="configAdminPin" value="1234">
+                </div>
+                <div class="form-group">
+                    <label>PIN Dueño:</label>
+                    <input type="password" id="configOwnerPin" value="0000">
+                </div>
+                <div class="form-group">
+                    <label>% Salud Predeterminado:</label>
+                    <input type="number" id="configSalud" value="4" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>% Pensión Predeterminado:</label>
+                    <input type="number" id="configPension" value="4" step="0.01">
+                </div>
+                <button onclick="guardarConfiguracion()" class="submit-btn" style="background: linear-gradient(135deg, #052A3D, #DAA520);">Guardar Configuración</button>
+            </div>
+        </div>
+
+        <div id="ownerHistorial" class="owner-section">
+            <h3>Historial Mensual Completo</h3>
+            <div id="historialOwnerPanel"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Historial -->
+    <div id="historialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Historial Mensual</h2>
+                <button onclick="closeHistorial()" class="close-btn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="historialContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+    <script src="app.js?v=3.0"></script>
+</body>
+</html>
+
+

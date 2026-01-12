@@ -1,0 +1,182 @@
+═══════════════════════════════════════════════════════════════════════
+   📱 GUÍA DE INSTALACIÓN Y ACTUALIZACIÓN
+   SASTRECONTROL - GONZÁLEZ BROTHER'S
+   Versión 3.0
+═══════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 📥 OPCIÓN 1: INSTALAR EN CELULAR (PWA - Aplicación Web Progresiva) │
+└─────────────────────────────────────────────────────────────────────┘
+
+La aplicación ya está configurada como PWA. Para instalarla:
+
+🔹 ANDROID (Chrome):
+   1. Abre Chrome en tu celular
+   2. Ve a la página de la app (necesitas subirla a internet primero)
+   3. Toca los 3 puntos (menú) arriba a la derecha
+   4. Selecciona "Agregar a pantalla de inicio" o "Instalar app"
+   5. Confirma la instalación
+   6. ¡Listo! Ahora tienes un ícono en tu pantalla
+
+🔹 iOS (Safari):
+   1. Abre Safari en tu iPhone/iPad
+   2. Ve a la página de la app
+   3. Toca el botón de compartir (cuadro con flecha)
+   4. Selecciona "Agregar a pantalla de inicio"
+   5. Confirma y dale un nombre
+   6. ¡Listo! Ahora tienes un ícono en tu pantalla
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 🌐 OPCIÓN 2: SUBIR A INTERNET (Hosting Gratuito)                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+Para que la app esté disponible online y puedas actualizarla:
+
+📌 NETLIFY (RECOMENDADO - Gratuito y fácil):
+
+   1. Ve a https://www.netlify.com
+   2. Crea una cuenta gratis con tu email
+   3. Haz clic en "Add new site" → "Deploy manually"
+   4. Arrastra toda la carpeta "Sastreria_Gonzalez_Brother´s"
+   5. ¡Listo! Te dará una URL como: https://gonzalez-brothers.netlify.app
+   
+   ✅ VENTAJAS:
+      - Gratis para siempre
+      - Actualizaciones fáciles (solo arrastra de nuevo los archivos)
+      - HTTPS automático (seguro)
+      - Funciona como app en celular
+
+📌 GITHUB PAGES (Para programadores):
+
+   1. Ve a https://github.com
+   2. Crea una cuenta
+   3. Crea un repositorio nuevo
+   4. Sube todos los archivos de la carpeta
+   5. Ve a Settings → Pages
+   6. Activa GitHub Pages
+   7. Tu app estará en: https://tuusuario.github.io/nombre-repo
+
+📌 VERCEL (Alternativa):
+
+   1. Ve a https://vercel.com
+   2. Crea cuenta gratis
+   3. Importa tu proyecto
+   4. Deploy automático
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 🔄 CÓMO ACTUALIZAR LA APLICACIÓN                                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+🔹 SI USAS NETLIFY:
+   1. Haz los cambios en los archivos (index.html, app.js, styles.css)
+   2. Ve a Netlify.com
+   3. Selecciona tu sitio
+   4. Arrastra la carpeta actualizada
+   5. ¡Automáticamente se actualiza para todos!
+
+🔹 SI USAS GITHUB PAGES:
+   1. Haz los cambios en los archivos
+   2. Sube los archivos nuevos al repositorio
+   3. GitHub actualiza automáticamente
+
+🔹 SI ES LOCAL (sin internet):
+   - Los usuarios deben descargar la nueva versión
+   - Presionar Ctrl + F5 para actualizar caché
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 👑 CONTROL DE ACCESO - Solo Empleados Registrados                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+✅ SEGURIDAD IMPLEMENTADA:
+
+   🔒 Domiciliarios:
+      - Solo pueden entrar si están registrados por el Admin
+      - Deben estar en estado "activo"
+      - Rol: "Domiciliario"
+
+   🔒 Señaladores:
+      - Solo pueden entrar si están registrados por el Admin
+      - Deben estar en estado "activo"
+      - Rol: "Señalador"
+
+   🔒 Sastres:
+      - Agregados por el Administrador con PIN
+      - Verificación con PIN de 4 dígitos
+
+   🔒 Administrador:
+      - PIN: 1234 (puedes cambiarlo en el código)
+
+   🔒 Dueño:
+      - PIN: 0000 (acceso total)
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 📋 PASOS PARA USAR LA APP POR PRIMERA VEZ                         │
+└─────────────────────────────────────────────────────────────────────┘
+
+1️⃣ EL ADMINISTRADOR (PIN: 1234):
+   - Entra con el PIN
+   - Va a "👥 Registro de Trabajadores"
+   - Registra a cada empleado:
+     * Domiciliarios
+     * Señaladores
+     * Cortadores, Planchadores, etc.
+
+2️⃣ EL ADMINISTRADOR:
+   - Va a "👔 Gestionar Sastres"
+   - Agrega cada sastre con su PIN personal
+
+3️⃣ LOS EMPLEADOS:
+   - Ya pueden entrar con su nombre
+   - Si no están registrados, recibirán un mensaje de error
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 💾 RESPALDO DE DATOS                                               │
+└─────────────────────────────────────────────────────────────────────┘
+
+⚠️ IMPORTANTE: Los datos se guardan en el navegador (localStorage)
+
+🔹 PARA HACER BACKUP:
+   - Ve a la consola del navegador (F12)
+   - Pestaña "Console"
+   - Escribe: localStorage
+   - Copia todo el contenido
+
+🔹 PARA RESTAURAR:
+   - Pega el contenido guardado en la consola
+
+💡 RECOMENDACIÓN: En el futuro se puede agregar:
+   - Base de datos en la nube (Firebase, Supabase)
+   - Sincronización automática entre dispositivos
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 🎨 CAMBIOS RECIENTES (v3.0)                                        │
+└─────────────────────────────────────────────────────────────────────┘
+
+✅ Logo más grande para que quepa "González Brother's" completo
+✅ Color dorado más realista (#DAA520 en vez de #FFD700)
+✅ Confirmación al eliminar trabajadores y sastres
+✅ Solo empleados registrados pueden acceder
+✅ Archivos HTML innecesarios eliminados
+✅ Código limpio y optimizado
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ 📞 SOPORTE Y AYUDA                                                 │
+└─────────────────────────────────────────────────────────────────────┘
+
+Si necesitas ayuda o quieres agregar nuevas funciones:
+- Módulo de inventario de telas
+- Sistema de citas
+- WhatsApp automático a clientes
+- Reportes en PDF
+- Base de datos en la nube
+
+¡Contacta al desarrollador!
+
+═══════════════════════════════════════════════════════════════════════
