@@ -1,0 +1,16 @@
+# .gitignore - Archivos que no se suben a GitHub
+
+# Carpetas de Visual Studio
+.vs/
+.vscode/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
