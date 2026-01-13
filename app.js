@@ -672,6 +672,9 @@ Fecha: ${new Date(factura.fecha).toLocaleString()}
 function initSastreScreen() {
     document.getElementById('sastreNameDisplay').textContent = currentUser;
     
+    // Cargar select de sastres
+    cargarSastresSelect();
+    
     // Mostrar periodo actual
     const periodo = getPeriodoActual();
     const periodoDiv = document.getElementById('periodoActual');
@@ -1033,6 +1036,7 @@ function agregarSastre(event) {
     
     alert('✅ Sastre agregado exitosamente');
     cargarTablaSastres();
+    cargarSastresSelect(); // Actualizar select de sastres
 }
 
 function cargarTablaSastres() {
