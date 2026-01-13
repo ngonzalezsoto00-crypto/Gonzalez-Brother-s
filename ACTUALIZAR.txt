@@ -1,0 +1,97 @@
+═══════════════════════════════════════════════════════════════
+   🔄 GUÍA RÁPIDA DE ACTUALIZACIÓN
+   SASTRECONTROL - GONZÁLEZ BROTHER'S
+═══════════════════════════════════════════════════════════════
+
+📝 CUANDO HAGAS CAMBIOS EN EL CÓDIGO
+───────────────────────────────────────────────────────────────
+
+1. Edita los archivos (index.html, app.js, styles.css)
+
+2. Abre PowerShell en la carpeta del proyecto
+
+3. Ejecuta estos comandos:
+
+   git add .
+   git commit -m "Descripción de los cambios"
+   git push
+
+4. Espera 1-2 minutos
+
+
+✅ ACTUALIZACIÓN AUTOMÁTICA
+───────────────────────────────────────────────────────────────
+
+Cuando un usuario que instaló la app:
+• Abre la aplicación
+• El service worker detecta nuevos archivos
+• Descarga la nueva versión automáticamente
+• La próxima vez que abra, verá la actualización
+
+NO necesitas hacer nada más.
+
+
+🔄 SI NECESITAS FORZAR LA ACTUALIZACIÓN
+───────────────────────────────────────────────────────────────
+
+Para que los cambios aparezcan INMEDIATAMENTE:
+
+1. Cambia la versión del cache en service-worker.js:
+   
+   const CACHE_NAME = 'sastrecontrol-v3';  // Cambia v2 → v3
+   
+2. Sube los cambios:
+   
+   git add service-worker.js
+   git commit -m "Actualización forzada"
+   git push
+
+3. Los usuarios verán los cambios al abrir la app
+
+
+📱 PARA LOS USUARIOS (Opcional)
+───────────────────────────────────────────────────────────────
+
+Si un usuario no ve los cambios:
+
+1. Cerrar completamente la app (deslizar para cerrar)
+2. Abrir de nuevo
+3. Si aún no aparece:
+   - En Chrome: ⋮ → Configuración → Borrar datos
+   - Volver a abrir la app
+
+
+💡 EJEMPLOS DE COMANDOS
+───────────────────────────────────────────────────────────────
+
+Ejemplo 1: Agregaste un nuevo sastre
+   git add .
+   git commit -m "Agregar nuevo sastre en la lista"
+   git push
+
+Ejemplo 2: Cambiaste colores
+   git add styles.css
+   git commit -m "Actualizar colores corporativos"
+   git push
+
+Ejemplo 3: Corregiste un bug
+   git add app.js
+   git commit -m "Corregir error al crear facturas"
+   git push
+
+
+⚡ COMANDO RÁPIDO (Todo en uno)
+───────────────────────────────────────────────────────────────
+
+git add . ; git commit -m "Actualización" ; git push
+
+
+🎯 IMPORTANTE
+───────────────────────────────────────────────────────────────
+
+✓ Los cambios aparecen en 1-2 minutos en GitHub Pages
+✓ La app se actualiza automáticamente la próxima vez que se abre
+✓ No necesitas reinstalar en el celular
+✓ Los datos (facturas, clientes) NO se borran al actualizar
+
+═══════════════════════════════════════════════════════════════

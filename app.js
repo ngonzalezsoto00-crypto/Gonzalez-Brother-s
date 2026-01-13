@@ -200,7 +200,8 @@ function enviarNotificacionWhatsApp(factura, prenda) {
     
     // Mostrar confirmación y abrir WhatsApp
     if (confirm(`📱 ¿Deseas enviar notificación por WhatsApp a ${factura.cliente?.nombre || factura.nombre}?\n\nNúmero: ${celular}`)) {
-        window.open(urlWhatsApp, '_blank');
+        // Usar location.href para que no cierre la app en celular
+        window.location.href = urlWhatsApp;
     }
 }
 
