@@ -35,6 +35,11 @@
             
             <div class="role-selection">
                 <h2 style="color: #1a3a52; font-size: 1.3em; margin-bottom: 20px; font-weight: 600;">Selecciona tu rol</h2>
+                
+                <a href="TUTORIAL.html" target="_blank" style="display: inline-block; background: #C9A961; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-bottom: 15px; font-size: 0.9em;">
+                    📖 Ver Tutorial para Nuevos Usuarios
+                </a>
+                
                 <button onclick="selectRole('domiciliario')" class="role-btn domiciliario-btn" style="background: linear-gradient(135deg, #1a3a52, #2a5a7c); border: 2px solid #C9A961; color: white;">
                     <span class="icon">🚗</span>
                     <span>Domiciliario</span>
@@ -630,6 +635,11 @@
         <div id="ownerConfiguracion" class="owner-section">
             <h3>Configuración del Sistema</h3>
             <div class="config-panel">
+                <div class="form-group">
+                    <label>🏢 Nombre de esta Sede:</label>
+                    <input type="text" id="configNombreSede" value="Sede Principal" placeholder="Ej: Sede 1, Sede Norte">
+                    <small style="color: #666; display: block; margin-top: 5px;">Identifica esta sede/tienda para futura sincronización</small>
+                </div>
                 <div class="form-group">
                     <label>PIN Administrador:</label>
                     <input type="password" id="configAdminPin" value="1234">

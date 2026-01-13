@@ -28,7 +28,9 @@ function initializeApp() {
             adminPin: '1234',
             ownerPin: '0000',
             salud: 4,
-            pension: 4
+            pension: 4,
+            nombreSede: 'Sede Principal',
+            primerUso: true
         };
         localStorage.setItem('config', JSON.stringify(defaultConfig));
     }
@@ -1874,6 +1876,7 @@ function cargarConfiguracion() {
     const config = JSON.parse(localStorage.getItem('config'));
     document.getElementById('configAdminPin').value = config.adminPin;
     document.getElementById('configOwnerPin').value = config.ownerPin;
+    document.getElementById('configNombreSede').value = config.nombreSede || 'Sede Principal';
     document.getElementById('configSalud').value = config.salud;
     document.getElementById('configPension').value = config.pension;
 }
@@ -1957,20 +1960,23 @@ function cargarReportesSastres() {
 }
 
 function guardarConfiguracion() {
+    const nombreSede = document.getElementById('configNombreSede').value.trim();
     const adminPin = document.getElementById('configAdminPin').value;
     const ownerPin = document.getElementById('configOwnerPin').value;
     const salud = parseFloat(document.getElementById('configSalud').value);
     const pension = parseFloat(document.getElementById('configPension').value);
     
     const config = {
+        nombreSede: nombreSede || 'Sede Principal',
         adminPin,
         ownerPin,
         salud,
-        pension
+        pension,
+        primerUso: false
     };
     
     localStorage.setItem('config', JSON.stringify(config));
-    alert('✅ Configuración guardada exitosamente');
+    alert('✅ Configuración guardada exitosamente\nSede: ' + config.nombreSede);
 }
 
 function cargarHistorialOwner() {
