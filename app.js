@@ -7,6 +7,15 @@
 let currentUser = null;
 let currentRole = null;
 
+// Prevenir cierre accidental de la app
+window.addEventListener('beforeunload', function (e) {
+    if (currentUser) {
+        e.preventDefault();
+        e.returnValue = '¿Estás seguro de que quieres salir? Perderás la sesión actual.';
+        return e.returnValue;
+    }
+});
+
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -120,9 +129,15 @@ function selectRole(role) {
 
 function cargarSastresSelect() {
     const sastres = JSON.parse(localStorage.getItem('sastres') || '[]');
+    console.log('Cargando sastres en select:', sastres);
     const select = document.getElementById('sastreSelect');
+    if (!select) {
+        console.error('Select de sastres no encontrado');
+        return;
+    }
     select.innerHTML = '<option value="">-- Seleccionar --</option>' +
         sastres.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+    console.log('Select actualizado con', sastres.length, 'sastres');
 }
 
 function loginDomiciliario() {
