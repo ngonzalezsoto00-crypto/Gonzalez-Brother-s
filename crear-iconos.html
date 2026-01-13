@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Generar Iconos PWA</title>
+</head>
+<body style="background: #1a3a52; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: Arial;">
+    <h2 style="color: white;">Generador de Iconos para PWA</h2>
+    <canvas id="canvas192" width="192" height="192" style="border: 2px solid #C9A961; margin: 10px;"></canvas>
+    <button onclick="descargar192()" style="background: #C9A961; color: #1a3a52; padding: 15px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px;">Descargar icon-192.png</button>
+    
+    <canvas id="canvas512" width="512" height="512" style="border: 2px solid #C9A961; margin: 10px;"></canvas>
+    <button onclick="descargar512()" style="background: #C9A961; color: #1a3a52; padding: 15px 30px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 10px;">Descargar icon-512.png</button>
+
+    <script>
+        // Función para crear el icono
+        function crearIcono(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // Fondo degradado
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#1a3a52');
+            gradient.addColorStop(1, '#2a5a7c');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Borde dorado
+            ctx.strokeStyle = '#C9A961';
+            ctx.lineWidth = size * 0.04;
+            ctx.strokeRect(size * 0.05, size * 0.05, size * 0.9, size * 0.9);
+            
+            // Emoji tijeras
+            ctx.font = `${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✂️', size / 2, size / 2.2);
+            
+            // Texto GB
+            ctx.font = `bold ${size * 0.15}px Arial`;
+            ctx.fillStyle = '#C9A961';
+            ctx.fillText('GB', size / 2, size * 0.78);
+        }
+
+        // Crear ambos iconos
+        crearIcono(document.getElementById('canvas192'), 192);
+        crearIcono(document.getElementById('canvas512'), 512);
+
+        // Función para descargar
+        function descargar192() {
+            const canvas = document.getElementById('canvas192');
+            const link = document.createElement('a');
+            link.download = 'icon-192.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function descargar512() {
+            const canvas = document.getElementById('canvas512');
+            const link = document.createElement('a');
+            link.download = 'icon-512.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>
