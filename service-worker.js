@@ -1,11 +1,15 @@
 // Service Worker para hacer la aplicación descargable (PWA)
 
-const CACHE_NAME = 'sastrecontrol-v1';
+const CACHE_NAME = 'sastrecontrol-v2';
 const urlsToCache = [
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './manifest.json',
+  './logo.png',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 // Instalación del Service Worker

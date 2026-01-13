@@ -2,7 +2,7 @@
   "name": "SastreControl - González Brother's",
   "short_name": "SastreControl",
   "description": "Sistema de Gestión de Producción para Sastrería González Brother's",
-  "start_url": "/index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1a3a52",
   "theme_color": "#C9A961",
