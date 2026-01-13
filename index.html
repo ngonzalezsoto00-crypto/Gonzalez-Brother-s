@@ -53,7 +53,7 @@
                 </button>
                 <button onclick="selectRole('owner')" class="role-btn owner-btn" style="background: linear-gradient(135deg, #C9A961, #d4b574); border: 2px solid #1a3a52; color: #1a3a52; font-weight: 600;">
                     <span class="icon">👑</span>
-                    <span>Dueño</span>
+                    <span>Gerente</span>
                 </button>
             </div>
         </div>
@@ -95,7 +95,7 @@
             </div>
 
             <div id="ownerAuth" class="auth-form" style="display: none;">
-                <label>PIN de Dueño:</label>
+                <label>PIN de Gerente:</label>
                 <input type="password" id="ownerPin" placeholder="Ingrese PIN">
                 <button onclick="loginOwner()" class="submit-btn">Ingresar</button>
                 <p class="hint">PIN predeterminado: 0000</p>
@@ -439,11 +439,6 @@
                             <option value="">-- Seleccionar Rol --</option>
                             <option value="Domiciliario">🚗 Domiciliario</option>
                             <option value="Señalador">📏 Señalador</option>
-                            <option value="Cortador">✂️ Cortador</option>
-                            <option value="Planchador">👔 Planchador</option>
-                            <option value="Auxiliar">🔧 Auxiliar</option>
-                            <option value="Bodeguero">📦 Bodeguero</option>
-                            <option value="Limpieza">🧹 Limpieza</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -592,10 +587,10 @@
         </div>
     </div>
 
-    <!-- Dashboard del Dueño -->
+    <!-- Dashboard del Gerente -->
     <div id="ownerScreen" class="screen">
         <div class="header" style="background: linear-gradient(135deg, #DAA520, #FFA000); border-bottom: 3px solid #052A3D;">
-            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">👑 Panel del Dueño</h2>
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">👑 Panel del Gerente</h2>
             <button onclick="logout()" class="logout-btn" style="background: white; color: #DAA520; border: 2px solid #052A3D;">Cerrar Sesión</button>
         </div>
 
@@ -640,7 +635,7 @@
                     <input type="password" id="configAdminPin" value="1234">
                 </div>
                 <div class="form-group">
-                    <label>PIN Dueño:</label>
+                    <label>PIN Gerente:</label>
                     <input type="password" id="configOwnerPin" value="0000">
                 </div>
                 <div class="form-group">
