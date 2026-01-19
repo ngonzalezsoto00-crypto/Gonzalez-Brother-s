@@ -2,14 +2,11 @@
 
 // IMPORTANTE: Cambiar la versión aquí fuerza actualización en todos los dispositivos
 // NUNCA se borran datos de localStorage - solo archivos en caché
-const CACHE_VERSION = '3.2.2';
+const CACHE_VERSION = '3.2.3';
 const CACHE_NAME = `sastrecontrol-v${CACHE_VERSION}`;
+
+// NO CACHEAR archivos críticos para forzar actualizaciones
 const urlsToCache = [
-  './',
-  './index.html',
-  './styles.css',
-  './app.js',
-  './manifest.json',
   './logo.png',
   './icon-192.png',
   './icon-512.png'
@@ -51,49 +48,25 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Interceptar peticiones - Estrategia Network First para archivos principales
+// Interceptar peticiones - SIEMPRE Network First
 self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-  
-  // Lista de archivos que siempre intentamos obtener de la red primero
-  const networkFirstFiles = [
-    '/index.html',
-    '/app.js',
-    '/styles.css',
-    '/manifest.json',
-    '/service-worker.js'
-  ];
-  
-  const isNetworkFirst = networkFirstFiles.some(file => url.pathname.endsWith(file) || url.pathname === './');
-  
-  if (isNetworkFirst) {
-    // Network First: Intenta red primero, luego cache
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Actualizar cache con la nueva versión
-          if (response && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Si falla la red, usar cache
-          return caches.match(event.request);
-        })
-    );
-  } else {
-    // Cache First para otros recursos (imágenes, etc.)
-    event.respondWith(
-      caches.match(event.request)
-        .then(response => {
-          return response || fetch(event.request);
-        })
-    );
-  }
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // Solo cachear imágenes
+        if (response && response.status === 200 && event.request.url.match(/\.(png|jpg|jpeg|gif|svg)$/)) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return response;
+      })
+      .catch(() => {
+        // Si falla la red, usar cache solo para imágenes
+        return caches.match(event.request);
+      })
+  );
 });
 
 // Notificar a la aplicación cuando hay una actualización disponible
