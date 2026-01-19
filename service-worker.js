@@ -2,7 +2,7 @@
 
 // IMPORTANTE: Cambiar la versión aquí fuerza actualización en todos los dispositivos
 // NUNCA se borran datos de localStorage - solo archivos en caché
-const CACHE_VERSION = '3.2.3';
+const CACHE_VERSION = '3.3.0';
 const CACHE_NAME = `sastrecontrol-v${CACHE_VERSION}`;
 
 // NO CACHEAR archivos críticos para forzar actualizaciones

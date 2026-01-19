@@ -13,7 +13,7 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 let db = null;
-let modoSincronizacion = localStorage.getItem('modoSincronizacion') || 'local'; // 'local', 'firebase', 'servidor'
+let modoSincronizacion = localStorage.getItem('modoSincronizacion') || 'firebase'; // 'local', 'firebase', 'servidor'
 
 function inicializarFirebase() {
     try {
@@ -154,4 +154,11 @@ function cambiarModoSincronizacion(modo) {
         return true;
     }
     return false;
+}
+
+// Auto-inicializar Firebase
+if (modoSincronizacion === 'firebase') {
+    document.addEventListener('DOMContentLoaded', function() {
+        inicializarFirebase();
+    });
 }

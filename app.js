@@ -26,9 +26,12 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(crearRespaldoAutomatico, 300000);
 });
 
-function initializeApp() {
+async function initializeApp() {
     // IMPORTANTE: Nunca sobrescribir datos existentes
     // Solo crear estructuras si NO existen
+    
+    // Cargar datos de Firebase si está configurado
+    await cargarDatosDeFirebase();
     
     // Crear configuración inicial si no existe
     if (!localStorage.getItem('config')) {
@@ -643,6 +646,13 @@ function registrarFacturaDomiciliario(event) {
     
     facturas.push(factura);
     localStorage.setItem('facturas', JSON.stringify(facturas));
+    
+    // Sincronizar con Firebase
+    if (typeof guardarEnFirebase === 'function') {
+        guardarEnFirebase('facturas', { facturas: facturas }).catch(err => {
+            console.error('Error sincronizando factura:', err);
+        });
+    }
     
     alert(`✅ ¡Factura #${numeroFactura} creada exitosamente!\nCliente: ${nombre}\nTotal: $${precioTotal.toLocaleString('es-CO')}\nAbono: $${abono.toLocaleString('es-CO')}\nSaldo: $${saldo.toLocaleString('es-CO')}`);
     
@@ -3520,8 +3530,34 @@ function exportarVolantePDF() {
 // SISTEMA DE SINCRONIZACIÓN
 // ============================================
 
+async function cargarDatosDeFirebase() {
+    const modo = localStorage.getItem('modoSincronizacion') || 'firebase';
+    if (modo !== 'firebase' || typeof cargarDeFirebase !== 'function') return;
+    
+    try {
+        console.log('🔄 Cargando datos de Firebase...');
+        
+        // Esperar a que Firebase se inicialice
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const datosFirebase = await cargarDeFirebase('facturas');
+        if (datosFirebase && datosFirebase.facturas) {
+            localStorage.setItem('facturas', JSON.stringify(datosFirebase.facturas));
+            console.log('✅ Facturas sincronizadas desde Firebase:', datosFirebase.facturas.length);
+        }
+        
+        // Cargar otros datos si existen
+        const clientes = await cargarDeFirebase('clientes');
+        if (clientes && clientes.clientes) {
+            localStorage.setItem('clientes', JSON.stringify(clientes.clientes));
+        }
+    } catch (error) {
+        console.error('❌ Error cargando de Firebase:', error);
+    }
+}
+
 function cargarModoSincronizacion() {
-    const modo = localStorage.getItem('modoSincronizacion') || 'local';
+    const modo = localStorage.getItem('modoSincronizacion') || 'firebase';
     const select = document.getElementById('modoSincronizacion');
     if (select) {
         select.value = modo;
