@@ -68,11 +68,28 @@ async function cargarDeFirebase(coleccion) {
     
     try {
         const coleccionConSede = obtenerColeccionConSede(coleccion);
-        const doc = await db.collection(coleccionConSede).doc('datos').get();
-        if (doc.exists) {
+        let doc = await db.collection(coleccionConSede).doc('datos').get();
+        
+        // Si no existe con prefijo de sede, intentar cargar datos antiguos SIN prefijo
+        if (!doc.exists) {
+            console.log(`⚠️ No hay datos en [${coleccionConSede}], buscando en [${coleccion}] (datos antiguos)...`);
+            doc = await db.collection(coleccion).doc('datos').get();
+            
+            if (doc.exists) {
+                console.log(`📦 Encontrados datos antiguos en [${coleccion}], migrando a [${coleccionConSede}]...`);
+                const datosAntiguos = doc.data();
+                
+                // Migrar datos antiguos al nuevo formato con sede
+                await db.collection(coleccionConSede).doc('datos').set(datosAntiguos);
+                console.log(`✅ Migración completada: [${coleccion}] → [${coleccionConSede}]`);
+                
+                return datosAntiguos;
+            }
+        } else {
             console.log(`📥 Datos cargados de Firebase [${coleccionConSede}]`);
             return doc.data();
         }
+        
         return null;
     } catch (error) {
         console.error('Error cargando de Firebase:', error);

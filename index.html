@@ -801,6 +801,9 @@
                     </button>
                     <div id="indicadorSync" style="width: 12px; height: 12px; background: #ccc; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.3);" title="Estado de sincronización"></div>
                 </div>
+                <button onclick="migrarDatosAntiguos()" style="width: 100%; margin-top: 10px; padding: 10px; background: #FF9800; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em;">
+                    📦 Migrar Datos Antiguos (Si no ves facturas/empleados)
+                </button>
                 <p id="estadoSync" style="margin: 10px 0 0 0; font-size: 0.9em; color: #666;"></p>
                 <p id="ultimaSync" style="margin: 5px 0 0 0; font-size: 0.85em; color: #999; font-style: italic;"></p>
                 <div id="infoSede" style="margin-top: 10px; padding: 10px; background: #e8f5e9; border-left: 4px solid #4CAF50; border-radius: 5px;">
@@ -1073,7 +1076,7 @@
     <script src="app.js"></script>
     <script>
         // LIMPIEZA AUTOMÁTICA DE CACHÉ AL DETECTAR NUEVA VERSIÓN
-        const VERSION_ACTUAL = '3.4.0';
+        const VERSION_ACTUAL = '3.4.1';
         const versionGuardada = localStorage.getItem('app_version');
         
         console.log('📌 Versión actual del código: ' + VERSION_ACTUAL);

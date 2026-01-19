@@ -3757,6 +3757,64 @@ async function sincronizarAhora() {
     }
 }
 
+async function migrarDatosAntiguos() {
+    const modo = localStorage.getItem('modoSincronizacion') || 'firebase';
+    
+    if (modo !== 'firebase') {
+        alert('⚠️ Esta función solo funciona con sincronización Firebase activa.');
+        return;
+    }
+    
+    if (!confirm('📦 Esta función migrará todos los datos antiguos (sin prefijo de sede) al formato nuevo.\n\n¿Continuar?')) {
+        return;
+    }
+    
+    const estadoEl = document.getElementById('estadoSync');
+    if (estadoEl) {
+        estadoEl.textContent = '📦 Migrando datos antiguos...';
+        estadoEl.style.color = '#FF9800';
+    }
+    
+    try {
+        if (typeof cargarDatosDeFirebase === 'function') {
+            await cargarDatosDeFirebase();
+            
+            if (estadoEl) {
+                estadoEl.textContent = '✅ Migración completada - Recargando vistas...';
+                estadoEl.style.color = '#4CAF50';
+            }
+            
+            // Recargar todas las vistas
+            if (typeof cargarTodasLasFacturas === 'function') {
+                cargarTodasLasFacturas();
+            }
+            if (typeof cargarListaEmpleados === 'function') {
+                cargarListaEmpleados();
+            }
+            if (typeof cargarTrabajadoresSelect === 'function') {
+                cargarTrabajadoresSelect('Sastre');
+                cargarTrabajadoresSelect('Señalador');
+                cargarTrabajadoresSelect('Domiciliario');
+            }
+            
+            alert('✅ Datos migrados exitosamente\n\nAhora deberías ver tus facturas y empleados.');
+            
+            setTimeout(() => {
+                if (estadoEl) {
+                    estadoEl.textContent = '☁️ Sincronización en la nube - Los cambios se comparten en tiempo real';
+                }
+            }, 3000);
+        }
+    } catch (error) {
+        console.error('Error migrando datos:', error);
+        if (estadoEl) {
+            estadoEl.textContent = '❌ Error en la migración: ' + error.message;
+            estadoEl.style.color = '#F44336';
+        }
+        alert('❌ Error al migrar datos. Ver consola para detalles.');
+    }
+}
+
 async function probarConexion() {
     const urlInput = document.getElementById('servidorURL');
     const url = urlInput.value.trim();
