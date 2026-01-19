@@ -162,49 +162,65 @@ function cambiarModoSincronizacion(modo) {
     return false;
 }
 
-// Sincronización en tiempo real
+// Sincronización en tiempo real para TODAS las colecciones
 function activarSincronizacionTiempoReal() {
     if (!db || modoSincronizacion !== 'firebase') return;
     
-    console.log('🔄 Activando sincronización en tiempo real...');
+    console.log('🔄 Activando sincronización en tiempo real COMPLETA...');
     
-    // Escuchar cambios en facturas
-    db.collection('facturas').doc('datos').onSnapshot((doc) => {
-        if (doc.exists) {
-            const datosFirebase = doc.data();
-            if (datosFirebase && datosFirebase.facturas) {
-                const facturasActuales = JSON.parse(localStorage.getItem('facturas') || '[]');
+    // Función auxiliar para sincronizar una colección
+    const sincronizarColeccion = (nombreColeccion, claveLocal, funcionRecargar) => {
+        db.collection(nombreColeccion).doc('datos').onSnapshot((doc) => {
+            if (doc.exists) {
+                const datosFirebase = doc.data();
+                const claveDatos = Object.keys(datosFirebase)[0]; // Primera clave del objeto
                 
-                // Solo actualizar si hay cambios
-                if (JSON.stringify(facturasActuales) !== JSON.stringify(datosFirebase.facturas)) {
-                    localStorage.setItem('facturas', JSON.stringify(datosFirebase.facturas));
-                    console.log('📥 Facturas sincronizadas:', datosFirebase.facturas.length);
+                if (datosFirebase && datosFirebase[claveDatos]) {
+                    const datosActuales = JSON.parse(localStorage.getItem(claveLocal) || '[]');
                     
-                    // Recargar la vista si está en la pantalla de facturas
-                    if (typeof cargarTodasLasFacturas === 'function') {
-                        cargarTodasLasFacturas();
+                    // Solo actualizar si hay cambios
+                    if (JSON.stringify(datosActuales) !== JSON.stringify(datosFirebase[claveDatos])) {
+                        localStorage.setItem(claveLocal, JSON.stringify(datosFirebase[claveDatos]));
+                        console.log(`📥 ${nombreColeccion} sincronizados:`, datosFirebase[claveDatos].length);
+                        
+                        // Recargar vista si existe la función
+                        if (funcionRecargar && typeof window[funcionRecargar] === 'function') {
+                            window[funcionRecargar]();
+                        }
+                        
+                        actualizarIndicadorSync('sincronizado');
+                        actualizarUltimaSync();
                     }
-                    
-                    actualizarIndicadorSync('sincronizado');
-                    actualizarUltimaSync();
                 }
             }
-        }
-    }, (error) => {
-        console.error('❌ Error en sincronización en tiempo real:', error);
-        actualizarIndicadorSync('error');
-    });
+        }, (error) => {
+            console.error(`❌ Error en sincronización de ${nombreColeccion}:`, error);
+            actualizarIndicadorSync('error');
+        });
+    };
     
-    // Escuchar cambios en clientes
-    db.collection('clientes').doc('datos').onSnapshot((doc) => {
+    // Sincronizar todas las colecciones
+    sincronizarColeccion('facturas', 'facturas', 'cargarTodasLasFacturas');
+    sincronizarColeccion('clientes', 'clientes', null);
+    sincronizarColeccion('empleados', 'empleados', 'cargarListaEmpleados');
+    sincronizarColeccion('sastres', 'sastres', 'cargarTrabajadoresSelect');
+    sincronizarColeccion('senaladores', 'senaladores', 'cargarTrabajadoresSelect');
+    sincronizarColeccion('prendas', 'prendas', null);
+    
+    // Sincronizar configuración
+    db.collection('config').doc('datos').onSnapshot((doc) => {
         if (doc.exists) {
-            const datosFirebase = doc.data();
-            if (datosFirebase && datosFirebase.clientes) {
-                localStorage.setItem('clientes', JSON.stringify(datosFirebase.clientes));
-                console.log('📥 Clientes sincronizados:', datosFirebase.clientes.length);
+            const configFirebase = doc.data();
+            if (configFirebase) {
+                localStorage.setItem('config', JSON.stringify(configFirebase));
+                console.log('📥 Configuración sincronizada');
+                actualizarIndicadorSync('sincronizado');
+                actualizarUltimaSync();
             }
         }
     });
+    
+    console.log('✅ Sincronización en tiempo real activada para TODAS las colecciones');
 }
 
 function actualizarIndicadorSync(estado) {

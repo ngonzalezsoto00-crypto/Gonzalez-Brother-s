@@ -615,7 +615,7 @@ function registrarFacturaDomiciliario(event) {
     } else {
         clientes.push(clienteData);
     }
-    localStorage.setItem('clientes', JSON.stringify(clientes));
+    guardarYSincronizar('clientes', clientes);
     
     // Crear factura
     const facturas = JSON.parse(localStorage.getItem('facturas') || '[]');
@@ -645,14 +645,7 @@ function registrarFacturaDomiciliario(event) {
     };
     
     facturas.push(factura);
-    localStorage.setItem('facturas', JSON.stringify(facturas));
-    
-    // Sincronizar con Firebase
-    if (typeof guardarEnFirebase === 'function') {
-        guardarEnFirebase('facturas', { facturas: facturas }).catch(err => {
-            console.error('Error sincronizando factura:', err);
-        });
-    }
+    guardarYSincronizar('facturas', facturas);
     
     alert(`✅ ¡Factura #${numeroFactura} creada exitosamente!\nCliente: ${nombre}\nTotal: $${precioTotal.toLocaleString('es-CO')}\nAbono: $${abono.toLocaleString('es-CO')}\nSaldo: $${saldo.toLocaleString('es-CO')}`);
     
@@ -950,13 +943,13 @@ function registrarTrabajoSastre(event) {
     // Guardar prenda
     const prendas = JSON.parse(localStorage.getItem('prendas') || '[]');
     prendas.push(prenda);
-    localStorage.setItem('prendas', JSON.stringify(prendas));
+    guardarYSincronizar('prendas', prendas);
     
     // Marcar factura como completada
     factura.completada = true;
     factura.sastreAsignado = currentUser;
     factura.fechaCompletado = fecha;
-    localStorage.setItem('facturas', JSON.stringify(facturas));
+    guardarYSincronizar('facturas', facturas);
     
     // Enviar notificación por WhatsApp
     enviarNotificacionWhatsApp(factura, prenda);
@@ -1247,14 +1240,14 @@ function agregarEmpleado(event) {
     };
     
     empleados.push(nuevoEmpleado);
-    localStorage.setItem('empleados', JSON.stringify(empleados));
+    guardarYSincronizar('empleados', empleados);
     
     // Si es señalador, agregarlo a la lista de señaladores
     if (rol === 'Señalador') {
         const senaladores = JSON.parse(localStorage.getItem('senaladores') || '[]');
         if (!senaladores.includes(nombre)) {
             senaladores.push(nombre);
-            localStorage.setItem('senaladores', JSON.stringify(senaladores));
+            guardarYSincronizar('senaladores', senaladores);
         }
     }
     
@@ -3535,24 +3528,63 @@ async function cargarDatosDeFirebase() {
     if (modo !== 'firebase' || typeof cargarDeFirebase !== 'function') return;
     
     try {
-        console.log('🔄 Cargando datos de Firebase...');
+        console.log('🔄 Cargando TODOS los datos de Firebase...');
         
         // Esperar a que Firebase se inicialice
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        const datosFirebase = await cargarDeFirebase('facturas');
-        if (datosFirebase && datosFirebase.facturas) {
-            localStorage.setItem('facturas', JSON.stringify(datosFirebase.facturas));
-            console.log('✅ Facturas sincronizadas desde Firebase:', datosFirebase.facturas.length);
+        // Cargar todas las colecciones
+        const colecciones = [
+            { nombre: 'facturas', clave: 'facturas' },
+            { nombre: 'clientes', clave: 'clientes' },
+            { nombre: 'empleados', clave: 'empleados' },
+            { nombre: 'sastres', clave: 'sastres' },
+            { nombre: 'senaladores', clave: 'senaladores' },
+            { nombre: 'prendas', clave: 'prendas' }
+        ];
+        
+        for (const coleccion of colecciones) {
+            try {
+                const datos = await cargarDeFirebase(coleccion.nombre);
+                if (datos && datos[coleccion.clave]) {
+                    localStorage.setItem(coleccion.clave, JSON.stringify(datos[coleccion.clave]));
+                    console.log(`✅ ${coleccion.nombre} sincronizados:`, datos[coleccion.clave].length);
+                }
+            } catch (err) {
+                console.log(`⚠️ ${coleccion.nombre} no encontrado en Firebase (usando local)`);
+            }
         }
         
-        // Cargar otros datos si existen
-        const clientes = await cargarDeFirebase('clientes');
-        if (clientes && clientes.clientes) {
-            localStorage.setItem('clientes', JSON.stringify(clientes.clientes));
+        // Cargar configuración
+        try {
+            const config = await cargarDeFirebase('config');
+            if (config) {
+                localStorage.setItem('config', JSON.stringify(config));
+                console.log('✅ Configuración sincronizada');
+            }
+        } catch (err) {
+            console.log('⚠️ Configuración no encontrada en Firebase (usando local)');
         }
+        
+        console.log('✅ Sincronización inicial completa');
     } catch (error) {
         console.error('❌ Error cargando de Firebase:', error);
+    }
+}
+
+// Función auxiliar para guardar y sincronizar automáticamente
+function guardarYSincronizar(clave, datos) {
+    // Guardar localmente
+    localStorage.setItem(clave, JSON.stringify(datos));
+    
+    // Sincronizar con Firebase si está activo
+    const modo = localStorage.getItem('modoSincronizacion') || 'firebase';
+    if (modo === 'firebase' && typeof guardarEnFirebase === 'function') {
+        const objetoDatos = {};
+        objetoDatos[clave] = datos;
+        guardarEnFirebase(clave, objetoDatos).catch(err => {
+            console.error(`Error sincronizando ${clave}:`, err);
+        });
     }
 }
 
@@ -3627,21 +3659,43 @@ async function sincronizarAhora() {
     
     try {
         if (modo === 'firebase' && typeof guardarEnFirebase === 'function') {
-            // Subir todos los datos locales a Firebase
-            const facturas = JSON.parse(localStorage.getItem('facturas') || '[]');
-            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            // Subir TODOS los datos locales a Firebase
+            const colecciones = [
+                { nombre: 'facturas', datos: JSON.parse(localStorage.getItem('facturas') || '[]') },
+                { nombre: 'clientes', datos: JSON.parse(localStorage.getItem('clientes') || '[]') },
+                { nombre: 'empleados', datos: JSON.parse(localStorage.getItem('empleados') || '[]') },
+                { nombre: 'sastres', datos: JSON.parse(localStorage.getItem('sastres') || '[]') },
+                { nombre: 'senaladores', datos: JSON.parse(localStorage.getItem('senaladores') || '[]') },
+                { nombre: 'prendas', datos: JSON.parse(localStorage.getItem('prendas') || '[]') }
+            ];
             
-            await guardarEnFirebase('facturas', { facturas: facturas });
-            await guardarEnFirebase('clientes', { clientes: clientes });
+            // Guardar todas las colecciones
+            for (const col of colecciones) {
+                const objetoDatos = {};
+                objetoDatos[col.nombre] = col.datos;
+                await guardarEnFirebase(col.nombre, objetoDatos);
+                console.log(`✅ ${col.nombre} subidos:`, col.datos.length);
+            }
+            
+            // Guardar configuración
+            const config = JSON.parse(localStorage.getItem('config') || '{}');
+            await guardarEnFirebase('config', config);
             
             // Cargar datos actualizados de Firebase
             if (typeof cargarDeFirebase === 'function') {
-                const facturasFirebase = await cargarDeFirebase('facturas');
-                if (facturasFirebase && facturasFirebase.facturas) {
-                    localStorage.setItem('facturas', JSON.stringify(facturasFirebase.facturas));
-                    if (typeof cargarTodasLasFacturas === 'function') {
-                        cargarTodasLasFacturas();
+                for (const col of colecciones) {
+                    const datosFirebase = await cargarDeFirebase(col.nombre);
+                    if (datosFirebase && datosFirebase[col.nombre]) {
+                        localStorage.setItem(col.nombre, JSON.stringify(datosFirebase[col.nombre]));
                     }
+                }
+                
+                // Recargar vistas si existen
+                if (typeof cargarTodasLasFacturas === 'function') {
+                    cargarTodasLasFacturas();
+                }
+                if (typeof cargarListaEmpleados === 'function') {
+                    cargarListaEmpleados();
                 }
             }
             
