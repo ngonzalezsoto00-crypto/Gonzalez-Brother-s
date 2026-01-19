@@ -795,7 +795,14 @@
                     <input type="text" id="servidorURL" placeholder="http://192.168.1.X:3000" style="width: 100%; padding: 8px; border: 2px solid #052A3D; border-radius: 5px;">
                     <button onclick="probarConexion()" style="margin-top: 5px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">🔌 Probar Conexión</button>
                 </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                    <button onclick="sincronizarAhora()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #4CAF50, #45a049); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em;">
+                        🔄 Sincronizar Ahora
+                    </button>
+                    <div id="indicadorSync" style="width: 12px; height: 12px; background: #ccc; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.3);" title="Estado de sincronización"></div>
+                </div>
                 <p id="estadoSync" style="margin: 10px 0 0 0; font-size: 0.9em; color: #666;"></p>
+                <p id="ultimaSync" style="margin: 5px 0 0 0; font-size: 0.85em; color: #999; font-style: italic;"></p>
             </div>
             
             <hr style="margin: 30px 0; border: 1px solid #ddd;">
@@ -1063,7 +1070,7 @@
     <script src="app.js"></script>
     <script>
         // LIMPIEZA AUTOMÁTICA DE CACHÉ AL DETECTAR NUEVA VERSIÓN
-        const VERSION_ACTUAL = '3.3.0';
+        const VERSION_ACTUAL = '3.3.1';
         const versionGuardada = localStorage.getItem('app_version');
         
         console.log('📌 Versión actual del código: ' + VERSION_ACTUAL);

@@ -3607,6 +3607,82 @@ function actualizarEstadoSync(modo) {
     estadoEl.style.color = modo === 'local' ? '#666' : '#4CAF50';
 }
 
+async function sincronizarAhora() {
+    const modo = localStorage.getItem('modoSincronizacion') || 'firebase';
+    
+    if (modo === 'local') {
+        alert('⚠️ Sincronización desactivada. Activa Firebase o Servidor para sincronizar.');
+        return;
+    }
+    
+    if (typeof actualizarIndicadorSync === 'function') {
+        actualizarIndicadorSync('sincronizando');
+    }
+    
+    const estadoEl = document.getElementById('estadoSync');
+    if (estadoEl) {
+        estadoEl.textContent = '🔄 Sincronizando datos...';
+        estadoEl.style.color = '#FFC107';
+    }
+    
+    try {
+        if (modo === 'firebase' && typeof guardarEnFirebase === 'function') {
+            // Subir todos los datos locales a Firebase
+            const facturas = JSON.parse(localStorage.getItem('facturas') || '[]');
+            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+            
+            await guardarEnFirebase('facturas', { facturas: facturas });
+            await guardarEnFirebase('clientes', { clientes: clientes });
+            
+            // Cargar datos actualizados de Firebase
+            if (typeof cargarDeFirebase === 'function') {
+                const facturasFirebase = await cargarDeFirebase('facturas');
+                if (facturasFirebase && facturasFirebase.facturas) {
+                    localStorage.setItem('facturas', JSON.stringify(facturasFirebase.facturas));
+                    if (typeof cargarTodasLasFacturas === 'function') {
+                        cargarTodasLasFacturas();
+                    }
+                }
+            }
+            
+            if (estadoEl) {
+                estadoEl.textContent = '✅ Sincronización completada';
+                estadoEl.style.color = '#4CAF50';
+            }
+            
+            if (typeof actualizarIndicadorSync === 'function') {
+                actualizarIndicadorSync('sincronizado');
+            }
+            
+            if (typeof actualizarUltimaSync === 'function') {
+                actualizarUltimaSync();
+            }
+            
+            setTimeout(() => {
+                if (estadoEl) {
+                    estadoEl.textContent = '☁️ Sincronización en la nube - Los cambios se comparten en tiempo real';
+                }
+            }, 3000);
+            
+        } else if (modo === 'servidor') {
+            alert('⚠️ Sincronización con servidor local aún no implementada');
+            if (estadoEl) {
+                estadoEl.textContent = '⚠️ Servidor local no disponible';
+                estadoEl.style.color = '#F44336';
+            }
+        }
+    } catch (error) {
+        console.error('Error sincronizando:', error);
+        if (estadoEl) {
+            estadoEl.textContent = '❌ Error al sincronizar: ' + error.message;
+            estadoEl.style.color = '#F44336';
+        }
+        if (typeof actualizarIndicadorSync === 'function') {
+            actualizarIndicadorSync('error');
+        }
+    }
+}
+
 async function probarConexion() {
     const urlInput = document.getElementById('servidorURL');
     const url = urlInput.value.trim();
