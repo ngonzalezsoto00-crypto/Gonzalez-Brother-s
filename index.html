@@ -8,9 +8,17 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>SastreControl - González Brother's v3.0 Moderna</title>
-    <link rel="stylesheet" href="styles.css?v=3.0">
+    <title>SastreControl - González Brother's v3.0.9</title>
+    <link rel="stylesheet" href="styles.css?v=3.0.9">
     <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Firebase SDK (opcional - solo si usas modo Firebase) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SastreControl">
@@ -36,12 +44,8 @@
             <div class="role-selection">
                 <h2 style="color: #1a3a52; font-size: 1.3em; margin-bottom: 20px; font-weight: 600;">Selecciona tu rol</h2>
                 
-                <a href="TUTORIAL.html" target="_blank" style="display: inline-block; background: #C9A961; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-bottom: 15px; font-size: 0.9em;">
-                    📖 Ver Tutorial para Nuevos Usuarios
-                </a>
-                
                 <button onclick="selectRole('domiciliario')" class="role-btn domiciliario-btn" style="background: linear-gradient(135deg, #1a3a52, #2a5a7c); border: 2px solid #C9A961; color: white;">
-                    <span class="icon">🚗</span>
+                    <span class="icon">🏍️</span>
                     <span>Domiciliario</span>
                 </button>
                 <button onclick="selectRole('senalador')" class="role-btn senalador-btn" style="background: linear-gradient(135deg, #1a3a52, #2a5a7c); border: 2px solid #C9A961; color: white;">
@@ -49,11 +53,11 @@
                     <span>Señalador</span>
                 </button>
                 <button onclick="selectRole('sastre')" class="role-btn sastre-btn" style="background: linear-gradient(135deg, #C9A961, #d4b574); border: 2px solid #1a3a52; color: #1a3a52;">
-                    <span class="icon">👔</span>
+                    <span class="icon">🧵</span>
                     <span>Sastre</span>
                 </button>
                 <button onclick="selectRole('admin')" class="role-btn admin-btn" style="background: linear-gradient(135deg, #1a3a52, #C9A961); border: 2px solid #C9A961; color: white;">
-                    <span class="icon">⚙️</span>
+                    <span class="icon">🛡️</span>
                     <span>Administrador</span>
                 </button>
                 <button onclick="selectRole('owner')" class="role-btn owner-btn" style="background: linear-gradient(135deg, #C9A961, #d4b574); border: 2px solid #1a3a52; color: #1a3a52; font-weight: 600;">
@@ -71,25 +75,48 @@
             <h2 id="authTitle" style="color: #1a3a52; font-size: 1.8em; margin-bottom: 25px; font-weight: 700;">Iniciar Sesión</h2>
             
             <div id="domiciliarioAuth" class="auth-form" style="display: none;">
-                <label>Nombre del Domiciliario:</label>
-                <input type="text" id="domiciliarioName" placeholder="Ej: Pedro Martínez">
-                <button onclick="loginDomiciliario()" class="submit-btn">Ingresar</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Seleccionar Domiciliario:</label>
+                        <select id="domiciliarioSelect" style="width: 100%;">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
+                    </div>
+                    <button onclick="cargarTrabajadoresSelect('Domiciliario'); return false;" style="margin-top: 22px; padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.2em;" title="Refrescar lista">🔄</button>
+                </div>
+                <label>PIN:</label>
+                <input type="password" id="domiciliarioPin" placeholder="Ingrese su PIN" maxlength="4">
+                <button onclick="loginTrabajador('Domiciliario')" class="submit-btn">Ingresar</button>
             </div>
 
             <div id="senaladorAuth" class="auth-form" style="display: none;">
-                <label>Nombre del Señalador:</label>
-                <input type="text" id="senaladorName" placeholder="Ej: Carlos López">
-                <button onclick="loginSenalador()" class="submit-btn">Ingresar</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Seleccionar Señalador:</label>
+                        <select id="senaladorSelect" style="width: 100%;">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
+                    </div>
+                    <button onclick="cargarTrabajadoresSelect('Señalador'); return false;" style="margin-top: 22px; padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.2em;" title="Refrescar lista">🔄</button>
+                </div>
+                <label>PIN:</label>
+                <input type="password" id="senaladorPin" placeholder="Ingrese su PIN" maxlength="4">
+                <button onclick="loginTrabajador('Señalador')" class="submit-btn">Ingresar</button>
             </div>
 
             <div id="sastreAuth" class="auth-form" style="display: none;">
-                <label>Seleccionar Sastre:</label>
-                <select id="sastreSelect">
-                    <option value="">-- Seleccionar --</option>
-                </select>
-                <label>PIN del Sastre:</label>
-                <input type="password" id="sastrePin" placeholder="Ingrese su PIN">
-                <button onclick="loginSastre()" class="submit-btn">Ingresar</button>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Seleccionar Sastre:</label>
+                        <select id="sastreSelect" style="width: 100%;">
+                            <option value="">-- Seleccionar --</option>
+                        </select>
+                    </div>
+                    <button onclick="cargarTrabajadoresSelect('Sastre'); return false;" style="margin-top: 22px; padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.2em;" title="Refrescar lista">🔄</button>
+                </div>
+                <label>PIN:</label>
+                <input type="password" id="sastrePin" placeholder="Ingrese su PIN" maxlength="4">
+                <button onclick="loginTrabajador('Sastre')" class="submit-btn">Ingresar</button>
             </div>
 
             <div id="adminAuth" class="auth-form" style="display: none;">
@@ -111,7 +138,7 @@
     <!-- Dashboard del Domiciliario -->
     <div id="domiciliarioScreen" class="screen">
         <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520;">
-            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🚗 Panel del Domiciliario</h2>
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🏍️ Panel del Domiciliario</h2>
             <div class="user-info">
                 <span id="domiciliarioNameDisplay" style="color: white; font-weight: bold;"></span>
                 <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Salir</button>
@@ -130,7 +157,7 @@
                     <div class="form-group">
                         <label>Cédula del Cliente: *</label>
                         <input type="text" id="domClienteCedula" placeholder="Ej: 1234567890" required>
-                        <button type="button" onclick="buscarClientePorCedulaDom()" class="btn-buscar">🔍 Buscar</button>
+                        <button type="button" onclick="buscarClientePorCedulaDom()" class="btn-buscar">� Buscar</button>
                     </div>
                 </div>
 
@@ -164,7 +191,7 @@
                     <textarea id="domTrabajoDescripcion" placeholder="Ej: Ajustar pantalón, bajar ruedo..." rows="4" required style="border: 2px solid #052A3D;"></textarea>
                 </div>
 
-                <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin: 25px 0 20px 0;">💰 Información de Pago</h4>
+                <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin: 25px 0 20px 0;">� Información de Pago</h4>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -194,7 +221,7 @@
     <!-- Dashboard del Señalador -->
     <div id="senaladorScreen" class="screen">
         <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520;">
-            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">📏 Panel del Señalador</h2>
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">✂️ Panel del Señalador</h2>
             <div class="user-info">
                 <span id="senaladorNameDisplay" style="color: white; font-weight: bold;"></span>
                 <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Salir</button>
@@ -202,18 +229,18 @@
         </div>
 
         <div class="info-panel" style="background: linear-gradient(135deg, #052A3D, #DAA520); color: white; padding: 20px; border-radius: 10px; margin: 20px; text-align: center; border: 3px solid #DAA520;">
-            <h3 style="margin: 0 0 10px 0;">📊 Tu Desempeño del Mes</h3>
+            <h3 style="margin: 0 0 10px 0;">� Tu Desempeño del Mes</h3>
             <p style="margin: 0; opacity: 0.9;">Solo visualización de tus facturas asignadas</p>
         </div>
 
         <div class="stats-senalador" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px;">
             <div class="stat-card-senalador" style="background: linear-gradient(135deg, #052A3D, #8AB4C7); border: 2px solid #052A3D;">
-                <h4 style="color: #052A3D;">📋 Número de Facturas</h4>
+                <h4 style="color: #052A3D;">� Número de Facturas</h4>
                 <p class="stat-number" id="totalFacturasSenalador" style="font-size: 3.5em; color: #052A3D; font-weight: bold;">0</p>
                 <p style="font-size: 0.9em; color: #666; margin: 5px 0 0 0;">Facturas asignadas</p>
             </div>
             <div class="stat-card-senalador" style="background: linear-gradient(135deg, #DAA520, #FFF9C4); border: 2px solid #DAA520;">
-                <h4 style="color: #F57C00;">💰 Total Acumulado</h4>
+                <h4 style="color: #F57C00;">� Total Acumulado</h4>
                 <p class="stat-number" style="font-size: 3.5em; color: #F57C00; font-weight: bold;">$ <span id="totalRecepcionadoSenalador">0</span></p>
                 <p style="font-size: 0.9em; color: #666; margin: 5px 0 0 0;">Suma de precios</p>
             </div>
@@ -244,7 +271,7 @@
                 <div class="form-group">
                     <label>Número de Factura:</label>
                     <input type="text" id="facturaInput" placeholder="Ej: FAC-001" required>
-                    <button type="button" onclick="buscarFacturaInfo()" class="btn-buscar">🔍 Buscar</button>
+                    <button type="button" onclick="buscarFacturaInfo()" class="btn-buscar">� Buscar</button>
                 </div>
                 <div id="infoFactura" class="info-factura" style="display: none;">
                     <p><strong>Cliente:</strong> <span id="infoCliente"></span></p>
@@ -302,32 +329,40 @@
         </div>
 
         <div class="menu-bottom">
-            <button onclick="showHistorial()" class="menu-btn">📊 Historial Mensual</button>
+            <button onclick="showHistorial()" class="menu-btn">� Historial Mensual</button>
         </div>
     </div>
 
     <!-- Dashboard del Administrador -->
     <div id="adminScreen" class="screen">
-        <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520;">
-            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">⚙️ Panel de Administración</h2>
-            <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Cerrar Sesión</button>
+        <div class="header" style="background: linear-gradient(135deg, #052A3D, #DAA520); border-bottom: 3px solid #DAA520; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+            <h2 style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin: 0;">🛡️ Panel de Administración</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="mostrarNotificaciones()" class="icon-btn" style="position: relative; background: rgba(255,255,255,0.2); border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; font-size: 1.2em;">
+                    🔔
+                    <span id="notificationBadge" style="display: none; position: absolute; top: -5px; right: -5px; background: #F44336; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; font-weight: bold;">0</span>
+                </button>
+                <button onclick="toggleModoOscuro()" class="icon-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 10px; border-radius: 50%; cursor: pointer; font-size: 1.2em;">🌙</button>
+                <button onclick="logout()" class="logout-btn" style="background: white; color: #052A3D; border: 2px solid #DAA520;">Cerrar Sesión</button>
+            </div>
         </div>
 
         <div class="admin-tabs">
-            <button onclick="showAdminTab('crearFactura')" class="tab-btn active" id="tabCrearFactura" style="background: linear-gradient(135deg, #052A3D, #052A3D);">📋 Recepción</button>
-            <button onclick="showAdminTab('facturas')" class="tab-btn" id="tabFacturas">📄 Facturas</button>
-            <button onclick="showAdminTab('gestionSastres')" class="tab-btn" id="tabGestionSastres">👔 Gestionar Sastres</button>
-            <button onclick="showAdminTab('gestionEmpleados')" class="tab-btn" id="tabGestionEmpleados" style="background: linear-gradient(135deg, #DAA520, #FFC107);">👥 Registro de Trabajadores</button>
-            <button onclick="showAdminTab('sastres')" class="tab-btn" id="tabSastres">📊 Producción Sastres</button>
+            <button onclick="showAdminTab('crearFactura')" class="tab-btn active" id="tabCrearFactura" style="background: linear-gradient(135deg, #052A3D, #052A3D);">� Recepción</button>
+            <button onclick="showAdminTab('facturas')" class="tab-btn" id="tabFacturas">📑 Facturas</button>
+            <button onclick="showAdminTab('busquedaAvanzada')" class="tab-btn" id="tabBusquedaAvanzada">🔎 Búsqueda Avanzada</button>
+            <button onclick="showAdminTab('dashboard')" class="tab-btn" id="tabDashboard">📈 Dashboard</button>
+            <button onclick="showAdminTab('gestionEmpleados')" class="tab-btn" id="tabGestionEmpleados" style="background: linear-gradient(135deg, #DAA520, #FFC107);">� Registro de Trabajadores</button>
+            <button onclick="showAdminTab('sastres')" class="tab-btn" id="tabSastres">🧵 Producción Sastres</button>
             <button onclick="showAdminTab('senaladores')" class="tab-btn" id="tabSenaladores">📏 Señaladores</button>
-            <button onclick="showAdminTab('liquidacion')" class="tab-btn" id="tabLiquidacion">💰 Liquidación</button>
-            <button onclick="showAdminTab('periodos')" class="tab-btn" id="tabPeriodos">📅 Periodos</button>
+            <button onclick="showAdminTab('liquidacion')" class="tab-btn" id="tabLiquidacion">� Liquidación</button>
+            <button onclick="showAdminTab('periodos')" class="tab-btn" id="tabPeriodos">🗓️ Periodos</button>
             <button onclick="showAdminTab('historial')" class="tab-btn" id="tabHistorial">📊 Historial</button>
         </div>
 
         <!-- Tab: Recepción -->
         <div id="adminTabCrearFactura" class="admin-tab active">
-            <h3 style="color: #052A3D; font-size: 1.5em;">📋 Recepción de Cliente y Creación de Factura</h3>
+            <h3 style="color: #052A3D; font-size: 1.5em;">� Recepción de Cliente y Creación de Factura</h3>
             <div class="recepcion-container">
                 <div style="background: linear-gradient(135deg, #052A3D, #DAA520); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; border: 3px solid #DAA520;">
                     <h4 style="margin: 0; color: white; font-size: 1.2em;">📝 FORMULARIO DE RECEPCIÓN</h4>
@@ -339,7 +374,7 @@
                         <div class="form-group">
                             <label>Cédula del Cliente: *</label>
                             <input type="text" id="adminClienteCedula" placeholder="Ej: 1234567890" required>
-                            <button type="button" onclick="buscarClientePorCedulaAdmin()" class="btn-buscar">🔍 Buscar</button>
+                            <button type="button" onclick="buscarClientePorCedulaAdmin()" class="btn-buscar">� Buscar</button>
                         </div>
                     </div>
 
@@ -372,6 +407,11 @@
                         <label>Descripción del Trabajo: *</label>
                         <textarea id="adminTrabajoDescripcion" placeholder="Ej: Ajustar pantalón a la cintura, bajar ruedo 3cm..." rows="4" required style="border: 2px solid #052A3D;"></textarea>
                     </div>
+                    
+                    <div class="form-group">
+                        <label>📅️ Fecha de Entrega Estimada:</label>
+                        <input type="date" id="adminFechaEntrega" style="border: 2px solid #052A3D;">
+                    </div>
 
                     <h4 style="color: #052A3D; border-bottom: 3px solid #052A3D; padding-bottom: 8px; margin: 25px 0 20px 0;">💰 Información de Pago</h4>
 
@@ -400,55 +440,34 @@
             </div>
         </div>
 
-        <!-- Tab: Gestión de Sastres -->
-        <div id="adminTabGestionSastres" class="admin-tab">
-            <h3>👥 Gestión de Sastres</h3>
-            
-            <div class="agregar-sastre">
-                <h4>➕ Agregar Nuevo Sastre</h4>
-                <form onsubmit="agregarSastre(event)" class="sastre-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre del Sastre: *</label>
-                            <input type="text" id="nuevoSastreNombre" placeholder="Ej: Juan Pérez" required>
-                        </div>
-                        <div class="form-group">
-                            <label>PIN de Acceso (4 dígitos): *</label>
-                            <input type="password" id="nuevoSastrePin" placeholder="Ej: 1234" maxlength="4" pattern="[0-9]{4}" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="submit-btn">✅ Agregar Sastre</button>
-                </form>
-            </div>
-
-            <div class="lista-sastres">
-                <h4>📊 Sastres Registrados</h4>
-                <div id="tablaSastresRegistrados" class="tabla-excel"></div>
-            </div>
-        </div>
-
         <!-- Tab: Gestión de Empleados -->
         <div id="adminTabGestionEmpleados" class="admin-tab">
-            <h3 style="color: #052A3D;">👥 Registro de Trabajadores</h3>
+            <h3 style="color: #052A3D;">� Registro de Trabajadores</h3>
             
             <div class="form-container" style="background: linear-gradient(135deg, #E1F5FE, #FFF9C4); border: 3px solid #DAA520; border-radius: 10px; padding: 20px; margin-bottom: 30px;">
                 <h4 style="color: #052A3D;">➕ Registrar Nuevo Trabajador</h4>
                 <form onsubmit="agregarEmpleado(event)">
                     <div class="form-group">
-                        <label>Nombre Completo del Trabajador:</label>
+                        <label>Nombre Completo del Trabajador: *</label>
                         <input type="text" id="nuevoEmpleadoNombre" required placeholder="Nombre completo">
                     </div>
                     <div class="form-group">
-                        <label>Rol del Trabajador:</label>
+                        <label>Rol del Trabajador: *</label>
                         <select id="nuevoEmpleadoRol" required style="border: 2px solid #052A3D;">
                             <option value="">-- Seleccionar Rol --</option>
-                            <option value="Domiciliario">🚗 Domiciliario</option>
+                            <option value="Sastre">🧵 Sastre</option>
+                            <option value="Domiciliario">🏍️ Domiciliario</option>
                             <option value="Señalador">📏 Señalador</option>
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>PIN de Acceso (4 dígitos): *</label>
+                        <input type="password" id="nuevoEmpleadoPin" required placeholder="Ej: 1234" maxlength="4" pattern="[0-9]{4}">
+                        <small style="color: #666; display: block; margin-top: 5px;">El trabajador usará este PIN para iniciar sesión</small>
+                    </div>
+                    <div class="form-group">
                         <label>Cédula:</label>
-                        <input type="text" id="nuevoEmpleadoCedula" required placeholder="Número de cédula">
+                        <input type="text" id="nuevoEmpleadoCedula" placeholder="Número de cédula (opcional)">
                     </div>
                     <div class="form-group">
                         <label>Teléfono:</label>
@@ -458,7 +477,7 @@
                 </form>
             </div>
 
-            <h4 style="color: #DAA520;">📋 Lista de Trabajadores Registrados</h4>
+            <h4 style="color: #DAA520;">� Lista de Trabajadores Registrados</h4>
             <div id="tablaEmpleadosRegistrados" class="tabla-excel"></div>
         </div>
 
@@ -467,9 +486,98 @@
             <h3>Gestión de Facturas</h3>
             <div class="search-box">
                 <input type="text" id="searchFacturasAdmin" placeholder="Buscar por nombre, cédula, celular o # de factura...">
-                <button onclick="buscarFacturasAdmin()" class="submit-btn">🔍 Buscar</button>
+                <button onclick="buscarFacturasAdmin()" class="submit-btn">� Buscar</button>
             </div>
             <div id="tablaFacturasAdmin" class="tabla-excel"></div>
+        </div>
+
+        <!-- Tab: Búsqueda Avanzada -->
+        <div id="adminTabBusquedaAvanzada" class="admin-tab">
+            <h3>� Búsqueda Avanzada de Facturas</h3>
+            <div class="filtros-avanzados" style="background: #f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Número de Factura:</label>
+                        <input type="text" id="filtroNumero" placeholder="Ej: FAC-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre del Cliente:</label>
+                        <input type="text" id="filtroCliente" placeholder="Ej: Juan Pérez">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Estado de la Prenda:</label>
+                        <select id="filtroEstado">
+                            <option value="">Todos los estados</option>
+                            <option value="Recibida">Recibida</option>
+                            <option value="En Proceso">En Proceso</option>
+                            <option value="Lista">Lista</option>
+                            <option value="Entregada">Entregada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sastre:</label>
+                        <select id="filtroSastre">
+                            <option value="">Todos los sastres</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha Desde:</label>
+                        <input type="date" id="filtroFechaInicio">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha Hasta:</label>
+                        <input type="date" id="filtroFechaFin">
+                    </div>
+                </div>
+                <button onclick="busquedaAvanzada()" class="submit-btn" style="width: 100%; margin-top: 15px;">🔍 Buscar</button>
+                <button onclick="limpiarFiltros()" class="cancel-btn" style="width: 100%; margin-top: 10px;">🔄 Limpiar Filtros</button>
+            </div>
+            
+            <h4 style="color: #052A3D; margin: 30px 0 15px 0; border-bottom: 2px solid #C9A961; padding-bottom: 10px;">📋 Todas las Facturas</h4>
+            <div id="listaTodasFacturas" style="max-height: 600px; overflow-y: auto; background: white; border-radius: 10px; padding: 15px;"></div>
+            
+            <div id="resultadosBusqueda" class="tabla-excel"></div>
+        </div>
+
+        <!-- Tab: Dashboard -->
+        <div id="adminTabDashboard" class="admin-tab">
+            <h3>📊 Dashboard de Estadísticas</h3>
+            <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #2196F3, #64B5F6); color: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">📋</div>
+                    <div id="totalFacturas" style="font-size: 2em; font-weight: bold;">0</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">Facturas Totales</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4CAF50, #81C784); color: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">✅</div>
+                    <div id="facturasCompletadas" style="font-size: 2em; font-weight: bold;">0</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">Trabajos Completados</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #FF9800, #FFB74D); color: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">⏳</div>
+                    <div id="facturasEnProceso" style="font-size: 2em; font-weight: bold;">0</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">En Proceso</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #9C27B0, #BA68C8); color: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">💰</div>
+                    <div id="ingresosMes" style="font-size: 1.5em; font-weight: bold;">$0</div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">Ingresos del Mes</div>
+                </div>
+            </div>
+            
+            <div class="ranking-section" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4 style="color: #052A3D; margin-bottom: 15px;">🏆 Ranking de Sastres del Mes</h4>
+                <div id="rankingSastres"></div>
+            </div>
+            
+            <div class="grafico-section" style="margin-top: 30px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h4 style="color: #052A3D; margin-bottom: 15px;">📈 Producción de los Últimos 6 Meses</h4>
+                <canvas id="graficoProduccion" style="max-height: 300px;"></canvas>
+            </div>
         </div>
 
         <!-- Tab: Señaladores -->
@@ -523,49 +631,88 @@
 
         <!-- Tab: Liquidación -->
         <div id="adminTabLiquidacion" class="admin-tab">
-            <h3>Liquidación y Deducciones</h3>
-            <div class="sastre-selector">
-                <label>Seleccionar Sastre:</label>
-                <select id="sastreSelectLiquidacion" onchange="calcularLiquidacion()">
-                    <option value="">-- Seleccionar --</option>
-                </select>
+            <h3>💰 Liquidación y Nómina</h3>
+            
+            <div class="trabajador-selector">
+                <label>Seleccionar Trabajador:</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select id="trabajadorSelectLiquidacion" onchange="calcularLiquidacion()" style="flex: 1;">
+                        <option value="">-- Seleccionar Trabajador --</option>
+                    </select>
+                    <button onclick="cargarTodosLosTrabjadoresLiquidacion()" style="padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">🔄</button>
+                </div>
             </div>
 
             <div id="liquidacionPanel" style="display: none;">
-                <div class="liquidacion-card">
-                    <h4>Suma Bruta del Mes</h4>
-                    <p class="amount-display">$ <span id="sumaBruta">0</span> COP</p>
+                <!-- Info del Trabajador -->
+                <div class="liquidacion-card" style="background: linear-gradient(135deg, #E3F2FD, #FFF9C4); border: 2px solid #DAA520; margin-bottom: 20px;">
+                    <h4>👤 Información del Trabajador</h4>
+                    <p><strong>Nombre:</strong> <span id="trabajadorNombre"></span></p>
+                    <p><strong>Rol:</strong> <span id="trabajadorRol"></span></p>
+                    <p><strong>Periodo:</strong> <span id="trabajadorPeriodo"></span></p>
                 </div>
 
+                <!-- Cálculo según Rol -->
+                <div id="calculoSastre" class="liquidacion-card" style="display: none;">
+                    <h4>👔 Producción de Sastre</h4>
+                    <p><strong>Total Producido:</strong> $ <span id="sastreTotalProducido">0</span> COP</p>
+                    <p><strong>Porcentaje Sastre:</strong> <span id="sastrePorcentaje">40</span>%</p>
+                    <p class="amount-display">Suma Bruta = $ <span id="sastreSumaBruta">0</span> COP</p>
+                </div>
+
+                <div id="calculoSenalador" class="liquidacion-card" style="display: none;">
+                    <h4>📏 Trabajo de Señalador</h4>
+                    <p><strong>Total Recepcionado en Sede:</strong> $ <span id="senaladorTotalRecepcionado">0</span> COP</p>
+                    <p><strong>Porcentaje Señalador:</strong> <span id="senaladorPorcentaje">11</span>%</p>
+                    <p class="amount-display">Suma Bruta = $ <span id="senaladorSumaBruta">0</span> COP</p>
+                </div>
+
+                <div id="calculoDomiciliario" class="liquidacion-card" style="display: none;">
+                    <h4>🚗 Trabajo de Domiciliario</h4>
+                    <p><strong>Total Recepcionado:</strong> $ <span id="domiciliarioTotalRecepcionado">0</span> COP</p>
+                    <p><strong>Porcentaje por Recepción:</strong> <span id="domiciliarioPorcentaje">11</span>%</p>
+                    <p><strong>Subtotal Recepción:</strong> $ <span id="domiciliarioSubtotalRecepcion">0</span> COP</p>
+                    <p style="margin-top: 10px;"><strong>Domicilios Realizados:</strong> <span id="domiciliosCantidad">0</span></p>
+                    <p><strong>Pago por Domicilio:</strong> $ <span id="domicilioPagoUnitario">20,000</span> COP</p>
+                    <p><strong>Subtotal Domicilios:</strong> $ <span id="domicilioSubtotalDomicilios">0</span> COP</p>
+                    <p class="amount-display">Suma Bruta = $ <span id="domiciliarioSumaBruta">0</span> COP</p>
+                </div>
+
+                <!-- Deducciones -->
                 <div class="deducciones-panel">
-                    <h4>Deducciones</h4>
+                    <h4>➖ Deducciones</h4>
                     <div class="form-group">
-                        <label>Salud (4%):</label>
+                        <label>Salud (<span id="displaySalud">4</span>%):</label>
                         <input type="number" id="porcentajeSalud" value="4" step="0.01" oninput="calcularLiquidacion()">
                         <p class="calculated">= $ <span id="montoSalud">0</span> COP</p>
                     </div>
                     <div class="form-group">
-                        <label>Pensión (4%):</label>
+                        <label>Pensión (<span id="displayPension">4</span>%):</label>
                         <input type="number" id="porcentajePension" value="4" step="0.01" oninput="calcularLiquidacion()">
                         <p class="calculated">= $ <span id="montoPension">0</span> COP</p>
                     </div>
                     <div class="form-group">
-                        <label>Préstamos ($ COP):</label>
+                        <label>Préstamos ($):</label>
                         <input type="number" id="montoPrestamo" value="0" step="1000" oninput="calcularLiquidacion()">
                     </div>
                     <div class="form-group">
-                        <label>Otros Descuentos ($ COP):</label>
+                        <label>Otros Descuentos ($):</label>
                         <input type="number" id="otrosDescuentos" value="0" step="1000" oninput="calcularLiquidacion()">
-                        <input type="text" id="conceptoOtros" placeholder="Concepto">
+                        <input type="text" id="conceptoOtros" placeholder="Concepto" style="margin-top: 5px;">
+                    </div>
+                    <div class="form-group" style="background: #FFEBEE; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        <p><strong>Total Deducciones:</strong> $ <span id="totalDeducciones">0</span> COP</p>
                     </div>
                 </div>
 
-                <div class="pago-neto-card">
-                    <h4>Pago Neto</h4>
-                    <p class="amount-display final">$ <span id="pagoNeto">0</span> COP</p>
+                <!-- Pago Neto -->
+                <div class="pago-neto-card" style="background: linear-gradient(135deg, #4CAF50, #8BC34A); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style="color: white;">💵 PAGO NETO</h4>
+                    <p class="amount-display final" style="font-size: 2em; font-weight: bold; color: white;">$ <span id="pagoNeto">0</span> COP</p>
                 </div>
 
-                <button onclick="generarVolante()" class="submit-btn">Generar Volante de Pago (PDF)</button>
+                <button onclick="generarVolante()" class="submit-btn" style="background: linear-gradient(135deg, #052A3D, #DAA520); margin-top: 20px;">📄 Generar Volante (TXT)</button>
+                <button onclick="exportarVolantePDF()" class="submit-btn" style="background: linear-gradient(135deg, #F44336, #E91E63); margin-top: 10px;">📑 Descargar Volante (PDF)</button>
             </div>
         </div>
 
@@ -634,6 +781,25 @@
 
         <div id="ownerConfiguracion" class="owner-section">
             <h3>Configuración del Sistema</h3>
+            
+            <!-- Panel de configuración de sincronización -->
+            <div style="margin-bottom: 30px; padding: 20px; background: #fff3cd; border-radius: 10px; border: 2px solid #DAA520;">
+                <h4 style="color: #052A3D; margin-top: 0; font-size: 1.2em;">☁️ Configuración de Sincronización</h4>
+                <p style="color: #666; margin-bottom: 15px;">Configura cómo se sincronizan los datos entre dispositivos</p>
+                <select id="modoSincronizacion" onchange="configurarSincronizacion()" style="width: 100%; padding: 10px; font-size: 1em; border: 2px solid #052A3D; border-radius: 5px;">
+                    <option value="local">💾 Solo este dispositivo (sin sincronización)</option>
+                    <option value="firebase">☁️ Sincronización en la nube (Firebase)</option>
+                    <option value="servidor">🌐 Sincronización en red local (Servidor)</option>
+                </select>
+                <div id="configServidor" style="display: none; margin-top: 10px;">
+                    <input type="text" id="servidorURL" placeholder="http://192.168.1.X:3000" style="width: 100%; padding: 8px; border: 2px solid #052A3D; border-radius: 5px;">
+                    <button onclick="probarConexion()" style="margin-top: 5px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">🔌 Probar Conexión</button>
+                </div>
+                <p id="estadoSync" style="margin: 10px 0 0 0; font-size: 0.9em; color: #666;"></p>
+            </div>
+            
+            <hr style="margin: 30px 0; border: 1px solid #ddd;">
+            
             <div class="config-panel">
                 <div class="form-group">
                     <label>🏢 Nombre de esta Sede:</label>
@@ -656,7 +822,63 @@
                     <label>% Pensión Predeterminado:</label>
                     <input type="number" id="configPension" value="4" step="0.01">
                 </div>
+                
+                <hr style="margin: 30px 0; border: 1px solid #ddd;">
+                
+                <h4 style="color: #052A3D; margin-bottom: 15px;">💰 Configuración de Liquidación</h4>
+                <p style="color: #666; margin-bottom: 15px;">Define los porcentajes y valores para el cálculo de nómina de cada rol.</p>
+                
+                <div class="form-group">
+                    <label>👔 % Sastre (sobre su producción):</label>
+                    <input type="number" id="configPorcentajeSastre" value="40" step="0.01" min="0" max="100">
+                    <small style="color: #666;">El sastre recibe este porcentaje de su producción total</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>📏 % Señalador (sobre total recepcionado en sede):</label>
+                    <input type="number" id="configPorcentajeSenalador" value="11" step="0.01" min="0" max="100">
+                    <small style="color: #666;">El señalador recibe este porcentaje del total recepcionado</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>🚗 % Domiciliario (sobre lo que recepciona):</label>
+                    <input type="number" id="configPorcentajeDomiciliario" value="11" step="0.01" min="0" max="100">
+                    <small style="color: #666;">El domiciliario recibe este porcentaje de lo que él recepciona</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>🏍️ Pago por Domicilio ($):</label>
+                    <input type="number" id="configPagoPorDomicilio" value="20000" step="1000" min="0">
+                    <small style="color: #666;">Valor que se paga al domiciliario por cada domicilio realizado</small>
+                </div>
+                
                 <button onclick="guardarConfiguracion()" class="submit-btn" style="background: linear-gradient(135deg, #052A3D, #DAA520);">Guardar Configuración</button>
+                
+                <hr style="margin: 30px 0; border: 1px solid #ddd;">
+                
+                <h4 style="color: #052A3D; margin-bottom: 15px;">💾 Gestión de Datos y Respaldos</h4>
+                <p style="color: #666; margin-bottom: 15px;">Los datos se guardan automáticamente en el navegador y se crean respaldos automáticos cada 5 minutos.</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 20px;">
+                    <button onclick="exportarDatos()" class="submit-btn" style="background: #4CAF50;">
+                        📥 Exportar Datos
+                    </button>
+                    <button onclick="importarDatos()" class="submit-btn" style="background: #2196F3;">
+                        📤 Importar Datos
+                    </button>
+                    <button onclick="restaurarRespaldo()" class="submit-btn" style="background: #FF9800;">
+                        🔄 Restaurar Respaldo
+                    </button>
+                    <button onclick="mostrarInfoRespaldo()" class="submit-btn" style="background: #9C27B0;">
+                        ℹ️ Info Respaldo
+                    </button>
+                </div>
+                
+                <div id="infoRespaldo" style="margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px; display: none;">
+                    <p style="margin: 5px 0;"><strong>Último respaldo automático:</strong> <span id="fechaRespaldo">N/A</span></p>
+                    <p style="margin: 5px 0; color: #666; font-size: 0.9em;">El sistema crea respaldos automáticos cada 5 minutos mientras la app está abierta.</p>
+                    <p style="margin: 5px 0; color: #666; font-size: 0.9em;">Se recomienda exportar datos periódicamente como respaldo externo.</p>
+                </div>
             </div>
         </div>
 
@@ -679,22 +901,341 @@
         </div>
     </div>
 
+    <!-- Modal de Vista Previa de Factura -->
+    <div id="facturaModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 600px; background: white; border-radius: 15px; overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1a3a52, #2d5a7b); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; color: white;">📄 Vista Previa - Factura</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="descargarFacturaActual()" class="icon-btn" style="background: rgba(255,255,255,0.15); color: white; border: none; font-size: 20px; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(76,175,80,0.8)'; this.title='Descargar';" onmouseout="this.style.background='rgba(255,255,255,0.15)';" title="Descargar">📥</button>
+                    <button onclick="imprimirFacturaActual()" class="icon-btn" style="background: rgba(255,255,255,0.15); color: white; border: none; font-size: 20px; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(33,150,243,0.8)'; this.title='Imprimir';" onmouseout="this.style.background='rgba(255,255,255,0.15)';" title="Imprimir">🖨️</button>
+                    <button onclick="cerrarModalFactura()" class="close-btn" style="background: rgba(255,255,255,0.15); color: white; border: none; font-size: 22px; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(244,67,54,0.8)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';" title="Cerrar">✕</button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <div id="facturaPreview" style="background: #f9f9f9; padding: 20px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; white-space: pre-wrap; max-height: 450px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de Ayuda / Chatbot -->
+    <style>
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4), 0 0 0 0 rgba(76, 175, 80, 0.7);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(76, 175, 80, 0.6), 0 0 0 10px rgba(76, 175, 80, 0);
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        #btnAyuda {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 50%, #66BB6A 100%);
+            color: white;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+            z-index: 9999;
+            animation: pulseGlow 2s infinite ease-in-out;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        #btnAyuda:hover {
+            animation: bounce 0.6s ease;
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 50%, #45a049 100%);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+        
+        #btnAyuda:active {
+            transform: scale(0.95);
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chatbot-show {
+            animation: slideInUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .ayuda-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .ayuda-btn:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        .chatbot-tab-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-tab-btn:hover {
+            background: #f0f0f0 !important;
+        }
+    </style>
+    <button id="btnAyuda" onclick="toggleChatbot()">🤖</button>
+
+    <!-- Panel de Chatbot -->
+    <div id="chatbotPanel" style="display: none; position: fixed; bottom: 100px; right: 20px; width: 360px; max-width: 90vw; height: 520px; max-height: 75vh; background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05); z-index: 9998; flex-direction: column; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #1a5f7a 0%, #159895 50%, #57c5b6 100%); color: white; padding: 18px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h3 style="margin: 0; font-size: 1.2em; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5em; animation: bounce 1s infinite;">🤖</span>
+                Asistente Virtual
+            </h3>
+            <button onclick="toggleChatbot()" style="background: rgba(255,255,255,0.2); border: none; color: white; font-size: 20px; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='rotate(90deg)';" onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='rotate(0deg)';">✕</button>
+        </div>
+        
+        <div class="chatbot-tabs" style="display: flex; background: linear-gradient(to bottom, #f8f9fa, #e9ecef); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <button onclick="showChatbotTab('ayuda')" id="tabChatAyuda" class="chatbot-tab-btn active" style="flex: 1; padding: 14px; border: none; background: white; cursor: pointer; font-weight: 600; font-size: 0.95em; border-bottom: 3px solid #159895; color: #1a5f7a;">❓ Ayuda</button>
+            <button onclick="showChatbotTab('sugerencias')" id="tabChatSugerencias" class="chatbot-tab-btn" style="flex: 1; padding: 14px; border: none; background: transparent; cursor: pointer; font-weight: 600; font-size: 0.95em; color: #666;">💡 Sugerencias</button>
+        </div>
+        
+        <!-- Tab Ayuda -->
+        <div id="chatTabAyuda" class="chatbot-tab" style="flex: 1; overflow-y: auto; padding: 18px;">
+            <h4 style="color: #1a5f7a; margin-top: 0; font-size: 1.1em; font-weight: 600; margin-bottom: 15px;">¿En qué puedo ayudarte? 😊</h4>
+            <div class="ayuda-opciones">
+                <button onclick="mostrarAyuda('login')" class="ayuda-btn" style="width: 100%; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); border: 2px solid #2196F3; border-radius: 12px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.95em; color: #1565C0; box-shadow: 0 2px 5px rgba(33, 150, 243, 0.2);">🔐 ¿Cómo iniciar sesión?</button>
+                <button onclick="mostrarAyuda('registrar')" class="ayuda-btn" style="width: 100%; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border: 2px solid #4CAF50; border-radius: 12px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.95em; color: #2E7D32; box-shadow: 0 2px 5px rgba(76, 175, 80, 0.2);">➕ ¿Cómo registrar trabajadores?</button>
+                <button onclick="mostrarAyuda('factura')" class="ayuda-btn" style="width: 100%; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border: 2px solid #FF9800; border-radius: 12px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.95em; color: #E65100; box-shadow: 0 2px 5px rgba(255, 152, 0, 0.2);">📋 ¿Cómo crear una factura?</button>
+                <button onclick="mostrarAyuda('liquidacion')" class="ayuda-btn" style="width: 100%; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%); border: 2px solid #9C27B0; border-radius: 12px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.95em; color: #6A1B9A; box-shadow: 0 2px 5px rgba(156, 39, 176, 0.2);">💰 ¿Cómo calcular liquidación?</button>
+                <button onclick="mostrarAyuda('respaldo')" class="ayuda-btn" style="width: 100%; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%); border: 2px solid #009688; border-radius: 12px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.95em; color: #00695C; box-shadow: 0 2px 5px rgba(0, 150, 136, 0.2);">💾 ¿Cómo hacer respaldos?</button>
+                <button onclick="mostrarAyuda('pin')" class="ayuda-btn" style="width: 100%; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%); border: 2px solid #F44336; border-radius: 12px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.95em; color: #C62828; box-shadow: 0 2px 5px rgba(244, 67, 54, 0.2);">🔑 Olvidé mi PIN</button>
+            </div>
+            <div id="ayudaRespuesta" style="margin-top: 20px; padding: 18px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border-radius: 12px; display: none; border-left: 4px solid #159895; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+        </div>
+        
+        <!-- Tab Sugerencias -->
+        <div id="chatTabSugerencias" class="chatbot-tab" style="display: none; flex: 1; overflow-y: auto; padding: 18px;">
+            <h4 style="color: #1a5f7a; margin-top: 0; font-size: 1.1em; font-weight: 600;">💡 Envía tus Sugerencias</h4>
+            <p style="color: #666; font-size: 0.9em; line-height: 1.5;">Ayúdanos a mejorar la aplicación con tus ideas y comentarios.</p>
+            <form onsubmit="enviarSugerencia(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tu Nombre:</label>
+                    <input type="text" id="sugerenciaNombre" placeholder="Nombre (opcional)" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tipo:</label>
+                    <select id="sugerenciaTipo" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="mejora">🔧 Mejora</option>
+                        <option value="error">🐛 Reportar Error</option>
+                        <option value="nueva">✨ Nueva Funcionalidad</option>
+                        <option value="otro">💭 Otro</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Mensaje: *</label>
+                    <textarea id="sugerenciaTexto" required placeholder="Describe tu sugerencia o problema..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 100px; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" style="padding: 12px; background: linear-gradient(135deg, #4CAF50, #8BC34A); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">📤 Enviar Sugerencia</button>
+            </form>
+            <div id="sugerenciasGuardadas" style="margin-top: 20px;">
+                <h5>📋 Sugerencias Recientes:</h5>
+                <div id="listaSugerencias" style="max-height: 150px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <script>
-        // Registrar Service Worker para PWA
+        // LIMPIEZA AUTOMÁTICA DE CACHÉ AL DETECTAR NUEVA VERSIÓN
+        const VERSION_ACTUAL = '3.2.2';
+        const versionGuardada = localStorage.getItem('app_version');
+        
+        console.log('📌 Versión actual del código: ' + VERSION_ACTUAL);
+        console.log('📌 Versión guardada en dispositivo: ' + versionGuardada);
+        
+        if (versionGuardada !== VERSION_ACTUAL) {
+            console.log('🔄 ACTUALIZANDO DE ' + versionGuardada + ' A ' + VERSION_ACTUAL);
+            
+            // Crear banner de actualización visible
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #4CAF50, #66BB6A); color: white; padding: 15px; text-align: center; z-index: 99999; font-size: 16px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+            banner.innerHTML = '🔄 ACTUALIZANDO A VERSIÓN ' + VERSION_ACTUAL + '... Por favor espere...';
+            document.body.insertBefore(banner, document.body.firstChild);
+            
+            // Desregistrar todos los Service Workers
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    console.log('🗑️ Encontrados ' + registrations.length + ' Service Workers');
+                    registrations.forEach(reg => {
+                        console.log('🗑️ Desregistrando SW...');
+                        reg.unregister();
+                    });
+                });
+            }
+            
+            // Limpiar todos los cachés
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    console.log('🗑️ Encontrados ' + names.length + ' cachés');
+                    names.forEach(name => {
+                        console.log('🗑️ Eliminando cache:', name);
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            // Guardar nueva versión
+            localStorage.setItem('app_version', VERSION_ACTUAL);
+            console.log('✅ Nueva versión guardada: ' + VERSION_ACTUAL);
+            
+            // Recargar si había una versión anterior
+            if (versionGuardada) {
+                setTimeout(() => {
+                    console.log('🔄 Recargando aplicación...');
+                    window.location.reload(true);
+                }, 2000);
+            } else {
+                banner.innerHTML = '✅ Aplicación instalada - Versión ' + VERSION_ACTUAL;
+                setTimeout(() => banner.remove(), 3000);
+            }
+        } else {
+            console.log('✅ Aplicación actualizada - Versión ' + VERSION_ACTUAL);
+        }
+        
+        // PROTECCIÓN CONTRA PÉRDIDA DE DATOS
+        // Crear respaldo antes de cualquier actualización
+        function crearRespaldoEmergencia() {
+            const datosImportantes = [
+                'empleados', 'sastres', 'senaladores', 'prendas', 
+                'facturas', 'clientes', 'config', 'periodosCerrados',
+                'historialMensual', 'contadorFacturas', 'modoSincronizacion'
+            ];
+            
+            const respaldo = {};
+            let tienedatos = false;
+            
+            datosImportantes.forEach(clave => {
+                const dato = localStorage.getItem(clave);
+                if (dato) {
+                    respaldo[clave] = dato;
+                    tienedatos = true;
+                }
+            });
+            
+            if (tienedatos) {
+                const timestamp = new Date().toISOString();
+                localStorage.setItem('respaldo_' + timestamp, JSON.stringify(respaldo));
+                localStorage.setItem('ultimoRespaldo', timestamp);
+                console.log('💾 Respaldo creado:', timestamp);
+                
+                // Mantener solo los últimos 5 respaldos
+                const respaldos = Object.keys(localStorage)
+                    .filter(k => k.startsWith('respaldo_'))
+                    .sort()
+                    .reverse();
+                    
+                if (respaldos.length > 5) {
+                    respaldos.slice(5).forEach(k => localStorage.removeItem(k));
+                }
+            }
+        }
+        
+        // Registrar Service Worker para PWA con detección de actualizaciones
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                // Crear respaldo antes de registrar el SW
+                crearRespaldoEmergencia();
+                
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
-                        console.log('Service Worker registrado:', registration);
+                        console.log('✅ Service Worker registrado:', registration);
+                        
+                        // Verificar actualizaciones cada 30 segundos
+                        setInterval(() => {
+                            registration.update();
+                        }, 30000);
+                        
+                        // Detectar cuando hay una nueva versión esperando
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('🔄 Nueva actualización detectada...');
+                            
+                            // CREAR RESPALDO ANTES DE ACTUALIZAR
+                            crearRespaldoEmergencia();
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Nueva versión disponible
+                                    console.log('✨ Nueva versión instalada');
+                                    
+                                    // Mostrar notificación al usuario
+                                    if (confirm('¡Hay una nueva versión disponible! ¿Desea actualizar ahora?\n\n(Sus datos están protegidos con respaldo automático)')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    } else {
+                                        console.log('💾 Actualización pospuesta por el usuario');
+                                    }
+                                }
+                            });
+                        });
                     })
                     .catch(error => {
-                        console.log('Error al registrar Service Worker:', error);
+                        console.log('❌ Error al registrar Service Worker:', error);
                     });
+                
+                // Detectar cuando el nuevo SW toma control
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    console.log('🔄 Nuevo Service Worker activado');
+                    // Crear respaldo final antes de recargar
+                    crearRespaldoEmergencia();
+                    // Recargar automáticamente
+                    window.location.reload();
+                });
             });
         }
     </script>
-    <script src="app.js?v=3.0"></script>
+    <script>
+        
+        // Manejar botón de retroceso en móviles
+        window.addEventListener('popstate', function(event) {
+            event.preventDefault();
+            if (currentUser && currentRole) {
+                if (confirm('¿Deseas cerrar sesión?')) {
+                    logout();
+                } else {
+                    // Volver a agregar al historial para que el botón funcione de nuevo
+                    history.pushState(null, null, window.location.href);
+                }
+            } else {
+                // Si está en login, no hacer nada o cerrar la app
+                if (confirm('¿Deseas salir de la aplicación?')) {
+                    window.close();
+                } else {
+                    history.pushState(null, null, window.location.href);
+                }
+            }
+        });
+        
+        // Agregar estado inicial al historial
+        history.pushState(null, null, window.location.href);
+    </script>
+    <script src="app.js?v=3.0.9"></script>
 </body>
 </html>
 
