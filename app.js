@@ -2238,8 +2238,21 @@ function guardarConfiguracion() {
         primerUso: false
     };
     
+    const sedeAnterior = JSON.parse(localStorage.getItem('config') || '{}').nombreSede;
+    const sedeCambio = sedeAnterior !== config.nombreSede;
+    
     localStorage.setItem('config', JSON.stringify(config));
-    alert('✅ Configuración guardada exitosamente\nSede: ' + config.nombreSede + '\nPorcentajes de liquidación actualizados');
+    
+    // Sincronizar configuración con Firebase
+    if (typeof guardarEnFirebase === 'function') {
+        guardarEnFirebase('config', config);
+    }
+    
+    if (sedeCambio) {
+        alert(`✅ Configuración guardada\n\n⚠️ IMPORTANTE: Cambiaste de sede\nDe: "${sedeAnterior}"\nA: "${config.nombreSede}"\n\nPresiona "Sincronizar Ahora" para cargar los datos de esta sede.`);
+    } else {
+        alert('✅ Configuración guardada exitosamente\nSede: ' + config.nombreSede + '\nPorcentajes de liquidación actualizados');
+    }
 }
 
 function cargarHistorialOwner() {
@@ -3601,6 +3614,13 @@ function cargarModoSincronizacion() {
             }
         }
         actualizarEstadoSync(modo);
+    }
+    
+    // Actualizar indicador de sede
+    const config = JSON.parse(localStorage.getItem('config') || '{}');
+    const sedeEl = document.getElementById('sedeActual');
+    if (sedeEl) {
+        sedeEl.textContent = config.nombreSede || 'Sede Principal';
     }
 }
 

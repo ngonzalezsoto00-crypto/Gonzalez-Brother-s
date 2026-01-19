@@ -803,6 +803,9 @@
                 </div>
                 <p id="estadoSync" style="margin: 10px 0 0 0; font-size: 0.9em; color: #666;"></p>
                 <p id="ultimaSync" style="margin: 5px 0 0 0; font-size: 0.85em; color: #999; font-style: italic;"></p>
+                <div id="infoSede" style="margin-top: 10px; padding: 10px; background: #e8f5e9; border-left: 4px solid #4CAF50; border-radius: 5px;">
+                    <strong style="color: #2e7d32;">🏢 Sede activa:</strong> <span id="sedeActual" style="color: #1b5e20; font-weight: bold;">Cargando...</span>
+                </div>
             </div>
             
             <hr style="margin: 30px 0; border: 1px solid #ddd;">
@@ -1070,7 +1073,7 @@
     <script src="app.js"></script>
     <script>
         // LIMPIEZA AUTOMÁTICA DE CACHÉ AL DETECTAR NUEVA VERSIÓN
-        const VERSION_ACTUAL = '3.3.2';
+        const VERSION_ACTUAL = '3.4.0';
         const versionGuardada = localStorage.getItem('app_version');
         
         console.log('📌 Versión actual del código: ' + VERSION_ACTUAL);

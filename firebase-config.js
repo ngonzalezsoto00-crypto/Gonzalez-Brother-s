@@ -15,6 +15,18 @@ const firebaseConfig = {
 let db = null;
 let modoSincronizacion = localStorage.getItem('modoSincronizacion') || 'firebase'; // 'local', 'firebase', 'servidor'
 
+// Obtener el nombre de la sede actual
+function obtenerNombreSede() {
+    const config = JSON.parse(localStorage.getItem('config') || '{}');
+    return config.nombreSede || 'Sede Principal';
+}
+
+// Obtener el nombre de colección con prefijo de sede
+function obtenerColeccionConSede(nombreColeccion) {
+    const sede = obtenerNombreSede().replace(/\s+/g, '_').toLowerCase(); // "Sede Principal" -> "sede_principal"
+    return `${sede}_${nombreColeccion}`;
+}
+
 function inicializarFirebase() {
     try {
         if (typeof firebase !== 'undefined') {
@@ -41,8 +53,9 @@ async function guardarEnFirebase(coleccion, datos) {
     if (modoSincronizacion !== 'firebase' || !db) return false;
     
     try {
-        await db.collection(coleccion).doc('datos').set(datos);
-        console.log(`Datos guardados en Firebase: ${coleccion}`);
+        const coleccionConSede = obtenerColeccionConSede(coleccion);
+        await db.collection(coleccionConSede).doc('datos').set(datos);
+        console.log(`💾 Datos guardados en Firebase [${coleccionConSede}]:`, Object.keys(datos)[0]);
         return true;
     } catch (error) {
         console.error('Error guardando en Firebase:', error);
@@ -54,9 +67,10 @@ async function cargarDeFirebase(coleccion) {
     if (modoSincronizacion !== 'firebase' || !db) return null;
     
     try {
-        const doc = await db.collection(coleccion).doc('datos').get();
+        const coleccionConSede = obtenerColeccionConSede(coleccion);
+        const doc = await db.collection(coleccionConSede).doc('datos').get();
         if (doc.exists) {
-            console.log(`Datos cargados de Firebase: ${coleccion}`);
+            console.log(`📥 Datos cargados de Firebase [${coleccionConSede}]`);
             return doc.data();
         }
         return null;
@@ -166,11 +180,13 @@ function cambiarModoSincronizacion(modo) {
 function activarSincronizacionTiempoReal() {
     if (!db || modoSincronizacion !== 'firebase') return;
     
-    console.log('🔄 Activando sincronización en tiempo real COMPLETA...');
+    const sede = obtenerNombreSede();
+    console.log(`🔄 Activando sincronización en tiempo real para: ${sede}`);
     
     // Función auxiliar para sincronizar una colección
     const sincronizarColeccion = (nombreColeccion, claveLocal, funcionRecargar) => {
-        db.collection(nombreColeccion).doc('datos').onSnapshot((doc) => {
+        const coleccionConSede = obtenerColeccionConSede(nombreColeccion);
+        db.collection(coleccionConSede).doc('datos').onSnapshot((doc) => {
             if (doc.exists) {
                 const datosFirebase = doc.data();
                 const claveDatos = Object.keys(datosFirebase)[0]; // Primera clave del objeto
@@ -208,7 +224,8 @@ function activarSincronizacionTiempoReal() {
     sincronizarColeccion('prendas', 'prendas', null);
     
     // Sincronizar configuración
-    db.collection('config').doc('datos').onSnapshot((doc) => {
+    const configColeccion = obtenerColeccionConSede('config');
+    db.collection(configColeccion).doc('datos').onSnapshot((doc) => {
         if (doc.exists) {
             const configFirebase = doc.data();
             if (configFirebase) {
